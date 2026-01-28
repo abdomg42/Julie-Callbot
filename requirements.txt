@@ -1,7 +1,9 @@
-torch
-torchaudio
-transformers
-sounddevice
-numpy
-webrtcvad
-scipy
+torchaudio==2.1.2
+sounddevice==0.4.6
+numpy==1.26.4
+webrtcvad==2.0.10
+scipy==1.11.4
+torch==2.1.2 
+transformers==4.36.2 
+tokenizers==0.15.0 
+sentencepiece==0.1.99
