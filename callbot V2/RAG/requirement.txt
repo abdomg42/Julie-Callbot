@@ -1,7 +1,0 @@
-python-dotenv
-python-docx
-langchain
-langchain-community
-langchain-openai
-faiss-cpu
-tiktoken

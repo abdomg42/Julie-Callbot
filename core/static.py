@@ -7,14 +7,14 @@ ALLOWED_ACTION = ("rag_query", "escalate")
 # Add/adjust intents here (10+ is fine).
 # Keep IDs stable: frontend/backend will key off these strings.
 INTENTS = (
-    "declaration_sinistre",    # Déclaration sinistre (FNOL - 60% des appels)
-    "suivi_dossier",           # Suivi dossier (25% des appels)
-    "documents_medicaux",      # Pièces justificatives
-    "indemnisation",           # Règlement/virement
-    "infos_contrat",           # Contrat/garanties
-    "reclamation",             # Litige
-    "transfert_humain",        # Escalade conseiller
-    "inconnu",                 # Fallback
+    "declare_claim",
+    "check_status",
+    "update_info",
+    "complaint",
+    "general_info",
+    "payment_info",
+    "cancel_policy",
+    "unknown",
 )
 
 # Keywords français naturels (ASR + typos)
