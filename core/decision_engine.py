@@ -1,36 +1,50 @@
-# Decision engine: merges retrieval + base knowledge + LLM (optional) into strict schema output.
-
-from typing import Dict, Any, List
-from .rules import score_urgency, keyword_intent_prior, confidence_from_retrieval
+from typing import Dict, Any
+from .rules import score_urgency, keyword_intent_prior
 from .schema import validate_decision_schema
 
-def retrieval_brief(retrieved: List[Dict[str, Any]], max_items: int = 2) -> str:
-    if not retrieved:
-        return "Aucun résultat."
-    lines = []
-    for h in retrieved[:max_items]:
-        lines.append(f"- doc_id={h.get('doc_id')} score={h.get('score')} label_intent={h.get('label_intent')} snippet={str(h.get('snippet',''))[:160]}")
-    return "\n".join(lines)
+def decide_rules_only(full_text: str,
+                      emotion_bert: Dict[str, Any] = None,
+                      emotion_wav2vec: Dict[str, Any] = None,
+                      audio_summary: Dict[str, Any] = None) -> Dict[str, Any]:
+    """
+    Rules-only fallback router (no retrieval).
+    Uses full_text as the primary signal.
+    Optionally uses emotion/audio_summary as light overrides for urgency/confidence.
+    """
+    full_text = (full_text or "").strip()
+    emotion_bert = emotion_bert or {}
+    emotion_wav2vec = emotion_wav2vec or {}
+    audio_summary = audio_summary or {}
 
-def decide_rules_only(text_query: str, text_context: str, retrieved: List[Dict[str, Any]]) -> Dict[str, Any]:
-    combined = (text_context.strip() + "\n" + text_query.strip()).strip()
-    urgency = score_urgency(combined)
-    prior_intent, prior_strength = keyword_intent_prior(combined)
+    # 1) Urgency from text
+    urgency = score_urgency(full_text)
 
-    top_intent = retrieved[0].get("label_intent") if retrieved else None
-    top_score = float(retrieved[0].get("score", 0.0)) if retrieved else 0.0
-
-    if top_intent and top_score >= 0.70:
-        intent = str(top_intent)
-    elif prior_intent != "unknown":
-        intent = prior_intent
-    else:
+    # 2) Intent prior from text
+    intent, strength = keyword_intent_prior(full_text)
+    if not intent:
         intent = "unknown"
 
-    conf = confidence_from_retrieval(retrieved, prior_strength)
+    # 3) Confidence heuristic (fallback only)
+    conf = 0.55 + 0.40 * float(strength)
+    if intent == "unknown":
+        conf -= 0.20
 
-    # action policy (tune later with feedback)
-    action = "escalate" if (urgency == "high" or conf < 0.55 or intent == "unknown") else "rag_query"
+    # 4) Cheap audio quality penalty (if audio is bad, lower confidence)
+    # (These keys come from your audio_summary)
+    silence_ratio = float(audio_summary.get("silence_ratio", 0.0) or 0.0)
+    clipping_ratio = float(audio_summary.get("clipping_ratio", 0.0) or 0.0)
+    if silence_ratio > 0.60:
+        conf -= 0.15
+    if clipping_ratio > 0.05:
+        conf -= 0.10
+
+    conf = max(0.0, min(1.0, conf))
+
+    # 5) Action routing
+    if urgency == "high" or conf < 0.60 or intent in ("complaint", "unknown"):
+        action = "escalate"
+    else:
+        action = "rag_query"
 
     out = {"intent": intent, "urgency": urgency, "action": action, "confidence": round(conf, 3)}
     validate_decision_schema(out)

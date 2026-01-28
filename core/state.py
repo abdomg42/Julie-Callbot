@@ -3,9 +3,9 @@ from typing import Any, Dict, List, Optional
 
 @dataclass
 class CoreState:
-    text_query: str
-    text_context: str
-    vector_embedding: List[float]  # 768-dim expected
-    retrieved: List[Dict[str, Any]] = field(default_factory=list)  # top-k retrieval hits
+    full_text: str
+    emotion_bert: Dict[str, Any]
+    emotion_wav2vec: Dict[str, Any]
+    audio_summary: Dict[str, Any]
     decision: Optional[Dict[str, Any]] = None                     # strict schema decision JSON
     debug: Dict[str, Any] = field(default_factory=dict)           # traces for tests/demo

@@ -23,8 +23,3 @@ def keyword_intent_prior(text: str) -> Tuple[str, float]:
             best_intent, best_hits = intent, hits
     strength = min(1.0, best_hits / 3.0) if best_hits > 0 else 0.0
     return best_intent, strength
-
-def confidence_from_retrieval(retrieved: List[Dict[str, Any]], prior_strength: float) -> float:
-    top_score = float(retrieved[0].get("score", 0.0)) if retrieved else 0.0
-    conf = 0.75 * top_score + 0.25 * float(prior_strength)
-    return max(0.0, min(1.0, conf))

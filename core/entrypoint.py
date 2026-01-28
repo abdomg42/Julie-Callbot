@@ -1,22 +1,20 @@
-from typing import Dict, Any, List
+from typing import Dict, Any
 from core.graph import build_app
 from core.state import CoreState
 
 _APP = build_app(use_llm=True)
 
-def run_ai_core(text_query: str, text_context: str, vector_embedding) -> Dict[str, Any]:
+def run_ai_core(full_text: str, emotion_bert: dict, emotion_wav2vec: dict, audio_summary: dict) -> Dict[str, Any]:
     if hasattr(vector_embedding, "tolist"):
         vector_embedding = vector_embedding.tolist()
 
     state = CoreState(
-        text_query=text_query,
-        text_context=text_context,
-        vector_embedding=vector_embedding
+        full_text=full_text,
+        emotion_bert=emotion_bert,
+        emotion_wav2vec=emotion_wav2vec,
+        audio_summary=audio_summary
     )
     out = _APP.invoke(state)      
     return out["decision"]
 
-def warmup():
-    dummy = [0.0] * 768
-    run_ai_core("ping", "warmup", dummy)
 

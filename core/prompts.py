@@ -3,7 +3,7 @@
 
 from .static import INTENTS, ALLOWED_URGENCY, ALLOWED_ACTION
 
-def decision_prompt(text_query: str, text_context: str, retrieval_brief: str) -> str:
+def decision_prompt(full_text: str, emotion_bert: dict, emotion_wav2vec: dict, audio_summary: dict) -> str:
     intents = ", ".join(INTENTS)
     urg = ", ".join(ALLOWED_URGENCY)
     act = ", ".join(ALLOWED_ACTION)
@@ -30,14 +30,10 @@ def decision_prompt(text_query: str, text_context: str, retrieval_brief: str) ->
     - Si confiance faible ou intent incertain -> action="escalate".
     - Sinon -> action="rag_query".
 
-    CONTEXTE:
-    {text_context}
-
-    REQUÊTE CLIENT:
-    {text_query}
-
-    RÉSULTATS RETRIEVAL (top-k, peut aider):
-    {retrieval_brief}
-
+    emotion_bert: {emotion_bert}
+    emotion_wav2vec: {emotion_wav2vec}
+    audio_summary: {audio_summary}
+    TEXTE COMPLET de l'appelant:
+    \"\"\"{full_text}\"\"\"
     JSON:
     """
