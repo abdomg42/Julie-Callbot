@@ -11,7 +11,7 @@ def run_inputs():
     recorder = AudioRecorder()
     whisper = Whisper()
     bert = BertSentiment()
-    wav2vec = Wav2VecSentiment()
+    # wav2vec = Wav2VecSentiment()
     pipeline = ParallelPipeline(whisper, bert, wav2vec)
 
     # Record until silence
