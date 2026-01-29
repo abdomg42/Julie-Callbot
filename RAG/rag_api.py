@@ -32,7 +32,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain.embeddings import CacheBackedEmbeddings
+from langchain.embeddings.cache import CacheBackedEmbeddings
 from langchain.storage import LocalFileStore
 import json
 import time

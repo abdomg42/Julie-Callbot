@@ -5,3 +5,4 @@ langchain-community
 langchain-openai
 faiss-cpu
 tiktoken
+langchain_huggingface
