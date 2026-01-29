@@ -32,8 +32,9 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain.embeddings.cache import CacheBackedEmbeddings
-from langchain.storage import LocalFileStore
+# Caching imports - commented out due to LangChain version compatibility
+# from langchain.embeddings.cache import CacheBackedEmbeddings
+# from langchain.storage import LocalFileStore
 import json
 import time
 from pathlib import Path
@@ -88,21 +89,28 @@ class RAGKnowledgeBase:
         # Use the default HuggingFace cache (where model is already downloaded)
         hf_cache = Path.home() / ".cache" / "huggingface" / "hub"
         
+        # 🚀 Try GPU first, fallback to CPU if not available
+        device = 'cpu'
+        try:
+            import torch
+            if torch.cuda.is_available():
+                device = 'cuda'
+                print(f"🚀 GPU detected! Using CUDA device: {torch.cuda.get_device_name()}")
+            else:
+                print("💻 No GPU available, using CPU")
+        except ImportError:
+            print("💻 PyTorch not available, using CPU")
+        
         base_embeddings = HuggingFaceEmbeddings(
             model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
             cache_folder=str(hf_cache),  # Use existing HuggingFace cache
-            model_kwargs={'device': 'cpu'},  # Use CPU (more stable)
+            model_kwargs={'device': device},  # Use GPU if available
             encode_kwargs={'normalize_embeddings': True}  # Better performance
         )
         
-        # 2. Add caching layer (for speed)
-        print("💾 Enabling embedding cache for instant responses...")
-        store = LocalFileStore(str(cache_dir))
-        self.embeddings = CacheBackedEmbeddings.from_bytes_store(
-            base_embeddings,
-            store,
-            namespace="paraphrase-multilingual-v2"
-        )
+        # 2. Use base embeddings (caching disabled for compatibility)
+        print("💾 Using base embeddings (caching disabled for now)...")
+        self.embeddings = base_embeddings
         
         # 3. Load FAISS index
         print("🔍 Loading FAISS index...")
@@ -120,7 +128,7 @@ class RAGKnowledgeBase:
         print(f"   🔒 Security: Offline, data stays local")
         print(f"   💾 Cache: {cache_dir}")
     
-    def search(self, query: str, k: int = 3) -> dict:
+    def search(self, query: str, k: int = 2) -> dict:  # Reduced from 3 to 2 for speed
         """
         🔍 MAIN API METHOD - RAG Search (FAST & SECURE)
         
@@ -155,7 +163,7 @@ class RAGKnowledgeBase:
         return {
             "documents": documents,
             "response_time_ms": round(response_time, 2),
-            "cached": response_time < 100  # If <100ms, likely cached
+            "cached": False  # Caching disabled
         }
     
     def search_with_metadata(self, query: str, k: int = 3) -> dict:
@@ -204,7 +212,7 @@ class RAGKnowledgeBase:
         return {
             "documents": documents,
             "response_time_ms": round(response_time, 2),
-            "cached": response_time < 100,
+            "cached": False,  # Caching disabled
             "cost": 0.00  # Always $0 (local)
         }
     
@@ -215,10 +223,10 @@ class RAGKnowledgeBase:
         return {
             "model": "paraphrase-multilingual-MiniLM-L12-v2",
             "deployment": "local (offline)",
-            "avg_response_time_ms": "<50 (cached), ~200 (uncached)",
+            "avg_response_time_ms": "~200ms (no caching)",
             "cost_per_query": "$0.00",
             "data_security": "All data stays on your server",
-            "cache_enabled": True
+            "cache_enabled": False
         }
 
 

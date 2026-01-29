@@ -1,7 +1,6 @@
 from audio.recorder import AudioRecorder
 from models.whisper import Whisper
 from models.bert_sentiment import BertSentiment
-from models.wav2vec_sentiment import Wav2VecSentiment
 from pipeline.parallel_pipeline import ParallelPipeline
 import time
 
@@ -13,8 +12,7 @@ start_init = time.time()
 recorder = AudioRecorder()
 whisper = Whisper()
 bert = BertSentiment()
-wav2vec = Wav2VecSentiment()
-pipeline = ParallelPipeline(whisper, bert, wav2vec)
+pipeline = ParallelPipeline(whisper, bert)
 print(f"Init time: {time.time() - start_init:.2f}s")
 
 # Record until silence
@@ -33,6 +31,4 @@ print("=== RESULTS ===")
 print(results)
 # print("TEXT:", results["full_text"])
 # print("BERT SENTIMENT:", results["bert_sentiment"])
-# print("WAV2VEC SENTIMENT:", results["wav2vec"]["audio_sentiment"])
-# print("WAV2VEC AUDIO SIGNAL SHAPE:", results["wav2vec"]["audio_signal"].shape)
 

@@ -1,7 +1,0 @@
-torch
-torchaudio
-transformers
-sounddevice
-numpy
-webrtcvad
-scipy

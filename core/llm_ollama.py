@@ -7,7 +7,7 @@ import requests
 from .schema import validate_decision_schema
 
 class OllamaDecisionLLM:
-    def __init__(self, model: str, base_url: str = "http://localhost:11434", timeout_s: float = 5):
+    def __init__(self, model: str, base_url: str = "http://localhost:11434", timeout_s: float = 10):
         self.model = model
         self.base_url = base_url.rstrip("/")
         self.timeout_s = timeout_s

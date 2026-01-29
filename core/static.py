@@ -7,6 +7,7 @@ ALLOWED_ACTION = ("rag_query", "escalate")
 # Add/adjust intents here (10+ is fine).
 # Keep IDs stable: frontend/backend will key off these strings.
 INTENTS = (
+    "greeting",
     "declare_claim",
     "check_status",
     "update_info",
@@ -17,47 +18,49 @@ INTENTS = (
     "unknown",
 )
 
-# Keywords français naturels (ASR + typos)
+# Keywords français naturels (ASR + typos + speech recognition errors)
 INTENT_KEYWORDS = {
-    "declaration_sinistre": [
+    "greeting": [
+        r"\b(bonjour|bonsoir|salut|hello|hi)\b",
+        r"\b(je voudrais|j'aimerais|je souhaite)\s+(parler|discuter)",
+        r"\b(allô|allo|oui)\s*$",
+        r"^\s*(bonjour|bonsoir|salut|hello)\s*[.,!]*\s*$"
+    ],
+    "declare_claim": [
         r"\b(déclar|declar|signaler)\w*\s+(sinistre|accident|dommage|probl[eè]me)",
         r"\b(j'ai eu un|j'ai fait un|j'ai eu)\s+(accident|chute|brûlure|coupure)",
         r"\b(ouvrir|créer|enregistrer)\s+dossier",
         r"\b(déclarer|déclaration)\s+(sinistre|accident)",
+        r"\b(je veux|je voudrais|j'aimerais)\s+(déclarer|signaler|annoncer)",
+        r"\b(sinistre|accident|dommage)",
         r"\b(je viens pour|je téléphone pour)\s+(sinistre|accident)",
     ],
-    "suivi_dossier": [
+    "check_status": [
         r"\b(suivi|statut|état|avancement|o[ùu] en est)\s+(mon dossier|le dossier)",
         r"\b(numéro|num)\s+(dossier|réf|référence)",
         r"\b(quand|combien de temps|délai)\s+(r[ée]glement|indemnisation)",
         r"\b(o[ùu]r|où en est|quel est l'état)",
     ],
-    "documents_medicaux": [
-        r"\b(certificat|feuille|arrêt)\s+(médical|médecin|travail)",
-        r"\b(facture|rapport|compte rendu)\s+m[ée]dical",
-        r"\b(quels|quelle)\s+(pi[èe]ce|document|papier)",
-        r"\b(j'ai envoy[éeé]|je dois envoyer)",
-    ],
-    "indemnisation": [
-        r"\b(indemnisation|r[ée]glement|virement|argent|paiement)",
-        r"\b(quand|combien|date)\s+(je vais recevoir|versement)",
-        r"\b(rib|iban|récupérer|mon argent)",
-    ],
-    "infos_contrat": [
+    "general_info": [
         r"\b(garantie|contrat|couverture|assurance|police)",
         r"\b(qu'est-ce qui est|est-ce que ça couvre)",
         r"\b(b[énée]ficiaire|qui est couvert)",
+        r"\b(information|renseignement|question)",
+        # Add fuzzy matching for CNP variations (speech recognition errors)
+        r"\b(cnp|cmp|cmpa|cnpa|semp|cempe)\s+(assurance|séance|assistance)",
+        r"\b(domaines?|activités?)\s+(de|du)\s+(cnp|cmp|cmpa|cnpa)",
+        r"\b(quell?e?s?\s+sont\s+les?)\s+.*(cnp|cmp|cmpa|cnpa)",
+        r"\b(informations?)\s+(sur|de)\s+(cnp|cmp|cmpa|cnpa)",
     ],
-    "reclamation": [
+    "complaint": [
         r"\b(réclamation|mécontent|pas d'accord|refus[éeé])",
         r"\b(ça fait longtemps|pas reçu|pas normal)",
         r"\b(recours|contester|litige)",
+        r"\b(en colère|furieux|énervé|scandalisé)",
+        r"\b(service.*nul|mauvais service|horrible)",
+        r"\b(ça ne va pas|pas acceptable|c'est inadmissible)",
     ],
-    "transfert_humain": [
-        r"\b(conseiller|humain|opérateur|personne)",
-        r"\b(j'veux parler à|transférer)",
-    ],
-    "inconnu": [],
+    "unknown": [],
 }
 # Urgency rules (hybrid rule+ML design: rules are cheap and reliable).
 URG_HIGH = [
@@ -78,5 +81,6 @@ URG_MED = [
 
 
 # Default model names (override with env vars in prod)
-DEFAULT_EMBED_MODEL = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"  # 768-dim
+# DEFAULT_EMBED_MODEL = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"  # 768-dim
+DEFAULT_EMBED_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 DEFAULT_OLLAMA_MODEL = "llama3.2:1b-instruct"

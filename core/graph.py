@@ -6,7 +6,7 @@ from requests.exceptions import RequestException
 from langgraph.graph import StateGraph, END
 
 from .state import CoreState
-from .decision_engine import decide_rules_only, retrieval_brief
+from .decision_engine import decide_rules_only
 from .prompts import decision_prompt
 from .llm_ollama import OllamaDecisionLLM
 from .static import DEFAULT_OLLAMA_MODEL
@@ -16,7 +16,7 @@ def node_preprocess(state: CoreState) -> CoreState:
     state.debug["text_len"] = len(state.full_text or "")
     state.debug["has_audio_summary"] = bool(state.audio_summary)
     state.debug["has_emotion_bert"] = bool(state.emotion_bert)
-    state.debug["has_emotion_wav2vec"] = bool(state.emotion_wav2vec)
+    # wav2vec removed
     return state
 
 
@@ -24,7 +24,6 @@ def node_decide_rules(state: CoreState) -> CoreState:
     # Deterministic fallback (fast)
     decision = decide_rules_only(state.full_text or "",
                                  emotion_bert=state.emotion_bert,
-                                 emotion_wav2vec=state.emotion_wav2vec,
                                  audio_summary=state.audio_summary)
     state.decision = decision
     state.debug["mode"] = "rules_only"
@@ -36,7 +35,6 @@ def node_decide_with_llm(state: CoreState, llm: OllamaDecisionLLM) -> CoreState:
     prompt = decision_prompt(
         full_text=state.full_text,
         emotion_bert=state.emotion_bert,
-        emotion_wav2vec=state.emotion_wav2vec,
         audio_summary=state.audio_summary,
     )
 

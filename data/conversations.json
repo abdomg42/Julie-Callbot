@@ -1,0 +1,684 @@
+[
+  {
+    "message_id": "MSG-3782C992",
+    "speaker": "customer",
+    "message_text": "Hello, this is a test message",
+    "turn_number": 1,
+    "detected_intent": "test_intent",
+    "detected_emotion": "neutral",
+    "confidence": 0.9,
+    "timestamp": "2026-01-29T14:33:02.195371",
+    "metadata": {
+      "test_message": true
+    },
+    "interaction_id": "INT-2026-B1444ED6"
+  },
+  {
+    "message_id": "MSG-D90D9434",
+    "speaker": "customer",
+    "message_text": "Comment faire un rachat sur mon contrat ?",
+    "turn_number": 1,
+    "detected_intent": "contract_info",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.85,
+    "timestamp": "2026-01-29T14:41:38.507848",
+    "metadata": {},
+    "interaction_id": "INT-2026-D30847E0"
+  },
+  {
+    "message_id": "MSG-58EDE90D",
+    "speaker": "bot",
+    "message_text": "Pour faire un rachat, vous devez...",
+    "turn_number": 1,
+    "detected_intent": "contract_info",
+    "detected_emotion": null,
+    "confidence": 0.8,
+    "timestamp": "2026-01-29T14:41:38.508851",
+    "metadata": {},
+    "interaction_id": "INT-2026-D30847E0"
+  },
+  {
+    "message_id": "MSG-04A6BD43",
+    "speaker": "customer",
+    "message_text": "Comment faire un rachat sur mon contrat ?",
+    "turn_number": 1,
+    "detected_intent": "contract_info",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.85,
+    "timestamp": "2026-01-29T15:35:58.959686",
+    "metadata": {},
+    "interaction_id": "INT-2026-1E4092BD"
+  },
+  {
+    "message_id": "MSG-DB2C7B3B",
+    "speaker": "bot",
+    "message_text": "Pour faire un rachat, vous devez...",
+    "turn_number": 1,
+    "detected_intent": "contract_info",
+    "detected_emotion": null,
+    "confidence": 0.8,
+    "timestamp": "2026-01-29T15:35:58.960686",
+    "metadata": {},
+    "interaction_id": "INT-2026-1E4092BD"
+  },
+  {
+    "message_id": "MSG-C90603CD",
+    "speaker": "customer",
+    "message_text": " Bonjour",
+    "turn_number": 1,
+    "detected_intent": "greeting",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.85,
+    "timestamp": "2026-01-29T15:58:16.122710",
+    "metadata": {
+      "emotion_score": 0.29847094416618347,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-C379BD32"
+  },
+  {
+    "message_id": "MSG-19709356",
+    "speaker": "bot",
+    "message_text": "",
+    "turn_number": 1,
+    "detected_intent": "greeting",
+    "detected_emotion": null,
+    "confidence": 0.46958304294402975,
+    "timestamp": "2026-01-29T15:58:18.257794",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 15569
+    },
+    "interaction_id": "INT-2026-C379BD32"
+  },
+  {
+    "message_id": "MSG-404A7517",
+    "speaker": "customer",
+    "message_text": " Je voulais savoir des informations sur CNP Assurance.",
+    "turn_number": 2,
+    "detected_intent": "general_info",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.833,
+    "timestamp": "2026-01-29T15:58:32.432860",
+    "metadata": {
+      "emotion_score": 0.43254873156547546,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-C379BD32"
+  },
+  {
+    "message_id": "MSG-E2C6ECB1",
+    "speaker": "bot",
+    "message_text": "",
+    "turn_number": 2,
+    "detected_intent": "general_info",
+    "detected_emotion": null,
+    "confidence": 0.6391131446933226,
+    "timestamp": "2026-01-29T15:58:34.482612",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 16222
+    },
+    "interaction_id": "INT-2026-C379BD32"
+  },
+  {
+    "message_id": "MSG-8079FF1A",
+    "speaker": "customer",
+    "message_text": " faire un crédit.",
+    "turn_number": 3,
+    "detected_intent": "unknown",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.35,
+    "timestamp": "2026-01-29T15:58:44.321236",
+    "metadata": {
+      "emotion_score": 0.26724493503570557,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-C379BD32"
+  },
+  {
+    "message_id": "MSG-308CAF3B",
+    "speaker": "bot",
+    "message_text": "",
+    "turn_number": 3,
+    "detected_intent": "unknown",
+    "detected_emotion": null,
+    "confidence": 0.49500907922946574,
+    "timestamp": "2026-01-29T15:58:46.383774",
+    "metadata": {
+      "action": "human_handoff",
+      "documents_count": 2,
+      "response_time_ms": 11900
+    },
+    "interaction_id": "INT-2026-C379BD32"
+  },
+  {
+    "message_id": "MSG-C4B2132B",
+    "speaker": "customer",
+    "message_text": " Bonjour",
+    "turn_number": 1,
+    "detected_intent": "greeting",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.85,
+    "timestamp": "2026-01-29T16:05:11.780658",
+    "metadata": {
+      "emotion_score": 0.29847094416618347,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-8B0BDBA6"
+  },
+  {
+    "message_id": "MSG-2FB13A78",
+    "speaker": "bot",
+    "message_text": "En ligne: monespaceclient.cnp.fr « Versement libre ». Conseiller: « Prendre rendez-vous ». Téléphone: 01 41 98 55 59 (lun-ven 8h30-18h30, sam 8h30-13h00). Y a-t-il autre chose que je puisse faire pour vous ?",
+    "turn_number": 1,
+    "detected_intent": "greeting",
+    "detected_emotion": null,
+    "confidence": 0.46958304294402975,
+    "timestamp": "2026-01-29T16:05:11.854318",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 13504
+    },
+    "interaction_id": "INT-2026-8B0BDBA6"
+  },
+  {
+    "message_id": "MSG-26D4BBEE",
+    "speaker": "customer",
+    "message_text": " Je veux savoir des informations sur CNP Assurance.",
+    "turn_number": 2,
+    "detected_intent": "general_info",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.833,
+    "timestamp": "2026-01-29T16:05:24.053962",
+    "metadata": {
+      "emotion_score": 0.43333861231803894,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-8B0BDBA6"
+  },
+  {
+    "message_id": "MSG-538D7B2A",
+    "speaker": "bot",
+    "message_text": "Assurance Vie et Épargne, Assurance Emprunteur (crédits immobiliers et prêts personnels), Prévoyance et Santé (décès, invalidité, accidents, complémentaire santé), Retraite (PERP, PER, solutions Madelin). Distribution via partenaires: La Banque Postale, Groupe BPCE, Amétis, Banco Santander, Caixa Ec... Y a-t-il autre chose que je puisse faire pour vous ?",
+    "turn_number": 2,
+    "detected_intent": "general_info",
+    "detected_emotion": null,
+    "confidence": 0.6434436744935645,
+    "timestamp": "2026-01-29T16:05:24.077342",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 12223
+    },
+    "interaction_id": "INT-2026-8B0BDBA6"
+  },
+  {
+    "message_id": "MSG-23274B29",
+    "speaker": "customer",
+    "message_text": " Quelles sont les domaines d'activité de CMPA séance ?",
+    "turn_number": 3,
+    "detected_intent": "unknown",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.35,
+    "timestamp": "2026-01-29T16:05:36.153883",
+    "metadata": {
+      "emotion_score": 0.29867228865623474,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-8B0BDBA6"
+  },
+  {
+    "message_id": "MSG-3D2C25BC",
+    "speaker": "bot",
+    "message_text": "Assurance Vie et Épargne, Assurance Emprunteur (crédits immobiliers et prêts personnels), Prévoyance et Santé (décès, invalidité, accidents, complémentaire santé), Retraite (PERP, PER, solutions Madelin). Distribution via partenaires: La Banque Postale, Groupe BPCE, Amétis, Banco Santander, Caixa Ec... Y a-t-il autre chose que je puisse faire pour vous ?",
+    "turn_number": 3,
+    "detected_intent": "unknown",
+    "detected_emotion": null,
+    "confidence": 0.5025281239297416,
+    "timestamp": "2026-01-29T16:05:36.166946",
+    "metadata": {
+      "action": "human_handoff",
+      "documents_count": 2,
+      "response_time_ms": 12087
+    },
+    "interaction_id": "INT-2026-8B0BDBA6"
+  },
+  {
+    "message_id": "MSG-20714C23",
+    "speaker": "customer",
+    "message_text": " ...",
+    "turn_number": 1,
+    "detected_intent": "unknown",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.35,
+    "timestamp": "2026-01-29T16:10:56.751299",
+    "metadata": {
+      "emotion_score": 0.2962181568145752,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-DC651D84",
+    "speaker": "bot",
+    "message_text": "Élément important du contrat. Conseils cnp.fr. Votre conseiller à disposition. Rédaction par courrier daté/signé ou testament chez notaire. Y a-t-il autre chose que je puisse faire pour vous ?",
+    "turn_number": 1,
+    "detected_intent": "unknown",
+    "detected_emotion": null,
+    "confidence": 0.3854485610503879,
+    "timestamp": "2026-01-29T16:10:56.814502",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 12617
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-489823F0",
+    "speaker": "customer",
+    "message_text": " Bonjour",
+    "turn_number": 2,
+    "detected_intent": "greeting",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.85,
+    "timestamp": "2026-01-29T16:11:05.247636",
+    "metadata": {
+      "emotion_score": 0.29847094416618347,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-D8F516A5",
+    "speaker": "bot",
+    "message_text": "Bonjour ! Je suis Julie, votre assistante virtuelle CNP Assurances. Comment puis-je vous aider aujourd'hui ?",
+    "turn_number": 2,
+    "detected_intent": "greeting",
+    "detected_emotion": null,
+    "confidence": 0.46958304294402975,
+    "timestamp": "2026-01-29T16:11:05.263195",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 8441
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-F530BBA9",
+    "speaker": "customer",
+    "message_text": " Je vais avoir des informations sur CNP Assurance.",
+    "turn_number": 3,
+    "detected_intent": "general_info",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.95,
+    "timestamp": "2026-01-29T16:11:19.637838",
+    "metadata": {
+      "emotion_score": 0.38664868474006653,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-DE5FFB0A",
+    "speaker": "bot",
+    "message_text": "Assurance Vie et Épargne, Assurance Emprunteur (crédits immobiliers et prêts personnels), Prévoyance et Santé (décès, invalidité, accidents, complémentaire santé), Retraite (PERP, PER, solutions Madelin). Distribution via partenaires: La Banque Postale, Groupe BPCE, Amétis, Banco Santander, Caixa Ec... Y a-t-il autre chose que je puisse faire pour vous ?",
+    "turn_number": 3,
+    "detected_intent": "general_info",
+    "detected_emotion": null,
+    "confidence": 0.6153224353310022,
+    "timestamp": "2026-01-29T16:11:19.654121",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 14388
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-0755D14A",
+    "speaker": "customer",
+    "message_text": " Comment faire un rassin ?",
+    "turn_number": 4,
+    "detected_intent": "unknown",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.35,
+    "timestamp": "2026-01-29T16:11:29.488985",
+    "metadata": {
+      "emotion_score": 0.2810816168785095,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-48D1B0CB",
+    "speaker": "bot",
+    "message_text": "Bonjour ! Je suis Julie, votre assistante CNP Assurances. Je suis là pour répondre à vos questions sur vos contrats d'assurance vie, emprunteur, prévoyance et retraite. Comment puis-je vous aider aujourd'hui ?",
+    "turn_number": 4,
+    "detected_intent": "unknown",
+    "detected_emotion": null,
+    "confidence": 0.4131646343703828,
+    "timestamp": "2026-01-29T16:11:29.505415",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 9848
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-EF7CACA0",
+    "speaker": "customer",
+    "message_text": " Comment faire un rassort ?",
+    "turn_number": 5,
+    "detected_intent": "unknown",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.35,
+    "timestamp": "2026-01-29T16:11:40.122156",
+    "metadata": {
+      "emotion_score": 0.29610365629196167,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-9CC9408F",
+    "speaker": "bot",
+    "message_text": "Bonjour ! Je suis Julie, votre assistante CNP Assurances. Je suis là pour répondre à vos questions sur vos contrats d'assurance vie, emprunteur, prévoyance et retraite. Comment puis-je vous aider aujourd'hui ?",
+    "turn_number": 5,
+    "detected_intent": "unknown",
+    "detected_emotion": null,
+    "confidence": 0.41264580152506536,
+    "timestamp": "2026-01-29T16:11:40.139315",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 10631
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-A0B102C0",
+    "speaker": "customer",
+    "message_text": " qui est ses impérences et quelles sont les histoires.",
+    "turn_number": 6,
+    "detected_intent": "unknown",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.35,
+    "timestamp": "2026-01-29T16:11:52.835436",
+    "metadata": {
+      "emotion_score": 0.2719469666481018,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-A5D45FFC",
+    "speaker": "bot",
+    "message_text": "Mission: « Assurons un monde plus ouvert ». Raison d'être: Assureurs et investisseurs responsables, animés par la vocation citoyenne, nous agissons avec nos partenaires pour une société inclusive et durable en apportant au plus grand nombre des solutions qui protègent et facilitent tous les parcours... Y a-t-il autre chose que je puisse faire pour vous ?",
+    "turn_number": 6,
+    "detected_intent": "unknown",
+    "detected_emotion": null,
+    "confidence": 0.3903146811986464,
+    "timestamp": "2026-01-29T16:11:52.852875",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 12711
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-0302AB5E",
+    "speaker": "customer",
+    "message_text": " C'est NP Assurance C'est NP Assurance c'est quoi ? Et qui est son histoire ?",
+    "turn_number": 7,
+    "detected_intent": "general_info",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.717,
+    "timestamp": "2026-01-29T16:12:05.362292",
+    "metadata": {
+      "emotion_score": 0.27374938130378723,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-46CBE0FE",
+    "speaker": "bot",
+    "message_text": "Assurance Vie et Épargne, Assurance Emprunteur (crédits immobiliers et prêts personnels), Prévoyance et Santé (décès, invalidité, accidents, complémentaire santé), Retraite (PERP, PER, solutions Madelin). Distribution via partenaires: La Banque Postale, Groupe BPCE, Amétis, Banco Santander, Caixa Ec... Y a-t-il autre chose que je puisse faire pour vous ?",
+    "turn_number": 7,
+    "detected_intent": "general_info",
+    "detected_emotion": null,
+    "confidence": 0.5117466878882584,
+    "timestamp": "2026-01-29T16:12:05.375352",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 12520
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-990DFB1E",
+    "speaker": "customer",
+    "message_text": " Comment sera imposé le retrait de mon insurance V?",
+    "turn_number": 8,
+    "detected_intent": "unknown",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.35,
+    "timestamp": "2026-01-29T16:12:17.172981",
+    "metadata": {
+      "emotion_score": 0.32450103759765625,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-E7CD7566",
+    "speaker": "bot",
+    "message_text": "Impôt sur les produits seulement (pas le capital). Exonérations possibles après: licenciement, retraite anticipée, invalidité, liquidation judiciaire. Prélèvements sociaux toujours applicables sauf multi-supports + invalidité 2e/3e cat. Y a-t-il autre chose que je puisse faire pour vous ?",
+    "turn_number": 8,
+    "detected_intent": "unknown",
+    "detected_emotion": null,
+    "confidence": 0.6579048066313379,
+    "timestamp": "2026-01-29T16:12:17.188443",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 11806
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-E2B1F36F",
+    "speaker": "customer",
+    "message_text": " Qu'est ce des paroles ? Comment faire un rassin ?",
+    "turn_number": 9,
+    "detected_intent": "unknown",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.35,
+    "timestamp": "2026-01-29T16:12:28.631271",
+    "metadata": {
+      "emotion_score": 0.39609494805336,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-DF543EB7",
+    "speaker": "bot",
+    "message_text": "Bonjour ! Je suis Julie, votre assistante CNP Assurances. Je suis là pour répondre à vos questions sur vos contrats d'assurance vie, emprunteur, prévoyance et retraite. Comment puis-je vous aider aujourd'hui ?",
+    "turn_number": 9,
+    "detected_intent": "unknown",
+    "detected_emotion": null,
+    "confidence": 0.39511781316163186,
+    "timestamp": "2026-01-29T16:12:28.644282",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 11452
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-E68C4EF1",
+    "speaker": "customer",
+    "message_text": " couverture 100 sur 100 ou 50 sur 100. Qu'est ce que cela signifie ?",
+    "turn_number": 10,
+    "detected_intent": "general_info",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.717,
+    "timestamp": "2026-01-29T16:12:43.527496",
+    "metadata": {
+      "emotion_score": 0.39336922764778137,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-58E5233E",
+    "speaker": "bot",
+    "message_text": "Prêt garantit à 100% obligatoirement. Personne seule: 100%. Plusieurs emprunteurs: 50/50 (moitié du capital par assureur) ou 100/100 (totalité par assureur). Y a-t-il autre chose que je puisse faire pour vous ?",
+    "turn_number": 10,
+    "detected_intent": "general_info",
+    "detected_emotion": null,
+    "confidence": 0.6200561809421643,
+    "timestamp": "2026-01-29T16:12:43.548185",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 14897
+    },
+    "interaction_id": "INT-2026-85C14925"
+  },
+  {
+    "message_id": "MSG-0D3D2B1E",
+    "speaker": "customer",
+    "message_text": " à retraite à la banque postale comme en liquider",
+    "turn_number": 1,
+    "detected_intent": "unknown",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.35,
+    "timestamp": "2026-01-29T16:14:10.524384",
+    "metadata": {
+      "emotion_score": 0.3048676550388336,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-A1A7B0F0"
+  },
+  {
+    "message_id": "MSG-977A6981",
+    "speaker": "bot",
+    "message_text": "Avec conseiller ou courrier CNP Assurances TSA 93847 NANTERRE Cedex 9 (+ identité, RIB, domicile, avis imposition). Pour PERP: choisissez rente individuelle ou réversible. Y a-t-il autre chose que je puisse faire pour vous ?",
+    "turn_number": 1,
+    "detected_intent": "unknown",
+    "detected_emotion": null,
+    "confidence": 0.6485396429780532,
+    "timestamp": "2026-01-29T16:14:10.554413",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 12493
+    },
+    "interaction_id": "INT-2026-A1A7B0F0"
+  },
+  {
+    "message_id": "MSG-FF09C380",
+    "speaker": "customer",
+    "message_text": " Bonjour",
+    "turn_number": 2,
+    "detected_intent": "greeting",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.85,
+    "timestamp": "2026-01-29T16:14:19.347898",
+    "metadata": {
+      "emotion_score": 0.29847094416618347,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-A1A7B0F0"
+  },
+  {
+    "message_id": "MSG-8DF616C1",
+    "speaker": "bot",
+    "message_text": "Bonjour ! Je suis Julie, votre assistante virtuelle CNP Assurances. Comment puis-je vous aider aujourd'hui ?",
+    "turn_number": 2,
+    "detected_intent": "greeting",
+    "detected_emotion": null,
+    "confidence": 0.46958304294402975,
+    "timestamp": "2026-01-29T16:14:19.364329",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 8809
+    },
+    "interaction_id": "INT-2026-A1A7B0F0"
+  },
+  {
+    "message_id": "MSG-E2F5B11E",
+    "speaker": "customer",
+    "message_text": " On se rend de sa vie pour préparer ma retraite?",
+    "turn_number": 3,
+    "detected_intent": "unknown",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.35,
+    "timestamp": "2026-01-29T16:14:29.571784",
+    "metadata": {
+      "emotion_score": 0.25366806983947754,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-A1A7B0F0"
+  },
+  {
+    "message_id": "MSG-F06553C1",
+    "speaker": "bot",
+    "message_text": "Oui! Vous pouvez: puiser à votre rythme, recevoir revenus réguliers par rachats programmés, convertir en rente viagère avec réversion. Plan d'Épargne Retraite (PER) avec avantages fiscaux. Y a-t-il autre chose que je puisse faire pour vous ?",
+    "turn_number": 3,
+    "detected_intent": "unknown",
+    "detected_emotion": null,
+    "confidence": 0.6272475489169772,
+    "timestamp": "2026-01-29T16:14:29.584647",
+    "metadata": {
+      "action": "rag_response",
+      "documents_count": 2,
+      "response_time_ms": 10210
+    },
+    "interaction_id": "INT-2026-A1A7B0F0"
+  },
+  {
+    "message_id": "MSG-799C819F",
+    "speaker": "customer",
+    "message_text": " Comment effectuer une réclamation auprès de CNP ?",
+    "turn_number": 4,
+    "detected_intent": "complaint",
+    "detected_emotion": "NEUTRAL",
+    "confidence": 0.717,
+    "timestamp": "2026-01-29T16:14:40.936989",
+    "metadata": {
+      "emotion_score": 0.26659825444221497,
+      "urgency": "low"
+    },
+    "interaction_id": "INT-2026-A1A7B0F0"
+  },
+  {
+    "message_id": "MSG-5CE39BEB",
+    "speaker": "bot",
+    "message_text": "Je vais vous transférer à un conseiller qui pourra mieux vous aider. Merci de patienter un instant.",
+    "turn_number": 4,
+    "detected_intent": "complaint",
+    "detected_emotion": null,
+    "confidence": 0.0,
+    "timestamp": "2026-01-29T16:14:40.936989",
+    "metadata": {
+      "action": "human_handoff",
+      "documents_count": 0,
+      "response_time_ms": 11342
+    },
+    "interaction_id": "INT-2026-A1A7B0F0"
+  }
+]

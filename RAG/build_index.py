@@ -37,9 +37,23 @@ def main():
                 }
             ))
 
+    # 🚀 Use GPU if available for faster embedding computation
+    device = 'cpu'
+    try:
+        import torch
+        if torch.cuda.is_available():
+            device = 'cuda'
+            print(f"🚀 GPU detected! Using CUDA device: {torch.cuda.get_device_name()}")
+        else:
+            print("💻 No GPU available, using CPU")
+    except ImportError:
+        print("💻 PyTorch not available, using CPU")
+
     # Use local HuggingFace embeddings (multilingual model for French support)
     embeddings = HuggingFaceEmbeddings(
-        model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+        model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        model_kwargs={'device': device},  # Use GPU if available
+        encode_kwargs={'normalize_embeddings': True}
     )
     vs = FAISS.from_documents(docs, embeddings)
     vs.save_local(index_dir)

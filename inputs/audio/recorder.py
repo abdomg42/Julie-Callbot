@@ -22,7 +22,8 @@ class AudioRecorder:
     def record_until_silence(self):
         frames = []
         silence_start = None
-        print("🎤 Speak now...")
+        # Message optimisé - système audio prêt immédiatement
+        print("🎤 Écoute active - Je vous écoute")
 
         with sd.RawInputStream(
             samplerate=self.sample_rate,

@@ -1,0 +1,469 @@
+[
+  {
+    "crm_action_id": "CRM-F17250AA",
+    "interaction_id": "INT-2026-B1444ED6",
+    "customer_id": "TEST-CUSTOMER-001",
+    "action_type": "test_action",
+    "input_data": {
+      "query": "test query"
+    },
+    "output_data": {
+      "result": "test successful"
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T14:33:02.196375",
+    "execution_time_ms": 150
+  },
+  {
+    "crm_action_id": "CRM-BE66C703",
+    "interaction_id": "INT-2026-D30847E0",
+    "customer_id": "CUST-TEST-FULL",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": "Comment faire un rachat ?"
+    },
+    "output_data": {
+      "documents": 2,
+      "response": "Pour faire un rachat..."
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T14:41:38.508851",
+    "execution_time_ms": 150
+  },
+  {
+    "crm_action_id": "CRM-D6F46499",
+    "interaction_id": "INT-2026-1E4092BD",
+    "customer_id": "CUST-TEST-FULL",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": "Comment faire un rachat ?"
+    },
+    "output_data": {
+      "documents": 2,
+      "response": "Pour faire un rachat..."
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T15:35:58.961687",
+    "execution_time_ms": 150
+  },
+  {
+    "crm_action_id": "CRM-59616E5D",
+    "interaction_id": "INT-2026-C379BD32",
+    "customer_id": "CUST-1769698682",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " Bonjour",
+      "intent": "greeting"
+    },
+    "output_data": {
+      "response": "",
+      "documents_used": [
+        "Question: Amétis: Comment faire un versement libre ?\n\nRéponse:\nEn ligne: monespaceclient.cnp.fr « Ve",
+        "Question: Bonsoir\n\nRéponse:\nBonsoir ! Je suis Julie, votre assistante virtuelle CNP Assurances. Je p"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T15:58:18.258800",
+    "execution_time_ms": 15569
+  },
+  {
+    "crm_action_id": "CRM-846A8E24",
+    "interaction_id": "INT-2026-C379BD32",
+    "customer_id": "CUST-1769698682",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " Je voulais savoir des informations sur CNP Assurance.",
+      "intent": "general_info"
+    },
+    "output_data": {
+      "response": "",
+      "documents_used": [
+        "Question: Quels sont les domaines d'activité de CNP Assurances ?\n\nRéponse:\nAssurance Vie et Épargne,",
+        "Question: Qui est CNP Assurances ? Quelle est son histoire ?\n\nRéponse:\nCNP Assurances (Caisse Nation"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T15:58:34.483628",
+    "execution_time_ms": 16222
+  },
+  {
+    "crm_action_id": "CRM-CE12F175",
+    "interaction_id": "INT-2026-C379BD32",
+    "customer_id": "CUST-1769698682",
+    "action_type": "human_handoff",
+    "input_data": {
+      "query": " faire un crédit.",
+      "intent": "unknown"
+    },
+    "output_data": {
+      "response": "",
+      "documents_used": [
+        "Question: Conseils pour rédiger clause bénéficiaire ?\n\nRéponse:\nÉlément important du contrat. Consei",
+        "Question: À retraite à La Banque Postale: comment liquider ?\n\nRéponse:\nAvec conseiller ou courrier C"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T15:58:46.383774",
+    "execution_time_ms": 11900
+  },
+  {
+    "crm_action_id": "CRM-F5691053",
+    "interaction_id": "INT-2026-8B0BDBA6",
+    "customer_id": "CUST-1769699098",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " Bonjour",
+      "intent": "greeting"
+    },
+    "output_data": {
+      "response": "En ligne: monespaceclient.cnp.fr « Versement libre ». Conseiller: « Prendre rendez-vous ». Téléphone: 01 41 98 55 59 (lun-ven 8h30-18h30, sam 8h30-13h00). Y a-t-il autre chose que je puisse faire pour vous ?",
+      "documents_used": [
+        "Question: Amétis: Comment faire un versement libre ?\n\nRéponse:\nEn ligne: monespaceclient.cnp.fr « Ve",
+        "Question: Bonsoir\n\nRéponse:\nBonsoir ! Je suis Julie, votre assistante virtuelle CNP Assurances. Je p"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:05:11.854318",
+    "execution_time_ms": 13504
+  },
+  {
+    "crm_action_id": "CRM-EBA7B31E",
+    "interaction_id": "INT-2026-8B0BDBA6",
+    "customer_id": "CUST-1769699098",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " Je veux savoir des informations sur CNP Assurance.",
+      "intent": "general_info"
+    },
+    "output_data": {
+      "response": "Assurance Vie et Épargne, Assurance Emprunteur (crédits immobiliers et prêts personnels), Prévoyance et Santé (décès, invalidité, accidents, complémentaire santé), Retraite (PERP, PER, solutions Madelin). Distribution via partenaires: La Banque Postale, Groupe BPCE, Amétis, Banco Santander, Caixa Ec... Y a-t-il autre chose que je puisse faire pour vous ?",
+      "documents_used": [
+        "Question: Quels sont les domaines d'activité de CNP Assurances ?\n\nRéponse:\nAssurance Vie et Épargne,",
+        "Question: Qui est CNP Assurances ? Quelle est son histoire ?\n\nRéponse:\nCNP Assurances (Caisse Nation"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:05:24.078343",
+    "execution_time_ms": 12223
+  },
+  {
+    "crm_action_id": "CRM-C2F3DBF5",
+    "interaction_id": "INT-2026-8B0BDBA6",
+    "customer_id": "CUST-1769699098",
+    "action_type": "human_handoff",
+    "input_data": {
+      "query": " Quelles sont les domaines d'activité de CMPA séance ?",
+      "intent": "unknown"
+    },
+    "output_data": {
+      "response": "Assurance Vie et Épargne, Assurance Emprunteur (crédits immobiliers et prêts personnels), Prévoyance et Santé (décès, invalidité, accidents, complémentaire santé), Retraite (PERP, PER, solutions Madelin). Distribution via partenaires: La Banque Postale, Groupe BPCE, Amétis, Banco Santander, Caixa Ec... Y a-t-il autre chose que je puisse faire pour vous ?",
+      "documents_used": [
+        "Question: Quels sont les domaines d'activité de CNP Assurances ?\n\nRéponse:\nAssurance Vie et Épargne,",
+        "Question: Je viens de perdre un proche. Quelles démarches ?\n\nRéponse:\n1. Informer Agira (agira-vie.f"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:05:36.174357",
+    "execution_time_ms": 12087
+  },
+  {
+    "crm_action_id": "CRM-09A64A35",
+    "interaction_id": "INT-2026-85C14925",
+    "customer_id": "CUST-1769699444",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " ...",
+      "intent": "unknown"
+    },
+    "output_data": {
+      "response": "Élément important du contrat. Conseils cnp.fr. Votre conseiller à disposition. Rédaction par courrier daté/signé ou testament chez notaire. Y a-t-il autre chose que je puisse faire pour vous ?",
+      "documents_used": [
+        "Question: Conseils pour rédiger clause bénéficiaire ?\n\nRéponse:\nÉlément important du contrat. Consei",
+        "Question: Couverture 100/100 ou 50/50: qu'est-ce que cela signifie ?\n\nRéponse:\nPrêt garantit à 100% "
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:10:56.820632",
+    "execution_time_ms": 12617
+  },
+  {
+    "crm_action_id": "CRM-7E12DA34",
+    "interaction_id": "INT-2026-85C14925",
+    "customer_id": "CUST-1769699444",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " Bonjour",
+      "intent": "greeting"
+    },
+    "output_data": {
+      "response": "Bonjour ! Je suis Julie, votre assistante virtuelle CNP Assurances. Comment puis-je vous aider aujourd'hui ?",
+      "documents_used": [
+        "Question: Amétis: Comment faire un versement libre ?\n\nRéponse:\nEn ligne: monespaceclient.cnp.fr « Ve",
+        "Question: Bonsoir\n\nRéponse:\nBonsoir ! Je suis Julie, votre assistante virtuelle CNP Assurances. Je p"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:11:05.264203",
+    "execution_time_ms": 8441
+  },
+  {
+    "crm_action_id": "CRM-9D56646D",
+    "interaction_id": "INT-2026-85C14925",
+    "customer_id": "CUST-1769699444",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " Je vais avoir des informations sur CNP Assurance.",
+      "intent": "general_info"
+    },
+    "output_data": {
+      "response": "Assurance Vie et Épargne, Assurance Emprunteur (crédits immobiliers et prêts personnels), Prévoyance et Santé (décès, invalidité, accidents, complémentaire santé), Retraite (PERP, PER, solutions Madelin). Distribution via partenaires: La Banque Postale, Groupe BPCE, Amétis, Banco Santander, Caixa Ec... Y a-t-il autre chose que je puisse faire pour vous ?",
+      "documents_used": [
+        "Question: Quels sont les domaines d'activité de CNP Assurances ?\n\nRéponse:\nAssurance Vie et Épargne,",
+        "Question: Qui est CNP Assurances ? Quelle est son histoire ?\n\nRéponse:\nCNP Assurances (Caisse Nation"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:11:19.656159",
+    "execution_time_ms": 14388
+  },
+  {
+    "crm_action_id": "CRM-F43BAEE0",
+    "interaction_id": "INT-2026-85C14925",
+    "customer_id": "CUST-1769699444",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " Comment faire un rassin ?",
+      "intent": "unknown"
+    },
+    "output_data": {
+      "response": "Bonjour ! Je suis Julie, votre assistante CNP Assurances. Je suis là pour répondre à vos questions sur vos contrats d'assurance vie, emprunteur, prévoyance et retraite. Comment puis-je vous aider aujourd'hui ?",
+      "documents_used": [
+        "Question: Bonjour\n\nRéponse:\nBonjour ! Je suis Julie, votre assistante CNP Assurances. Je suis là pou",
+        "Question: Amétis: Comment faire un rachat ?\n\nRéponse:\nEn ligne: monespaceclient.cnp.fr « Faire un ra"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:11:29.506470",
+    "execution_time_ms": 9848
+  },
+  {
+    "crm_action_id": "CRM-B3A16C29",
+    "interaction_id": "INT-2026-85C14925",
+    "customer_id": "CUST-1769699444",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " Comment faire un rassort ?",
+      "intent": "unknown"
+    },
+    "output_data": {
+      "response": "Bonjour ! Je suis Julie, votre assistante CNP Assurances. Je suis là pour répondre à vos questions sur vos contrats d'assurance vie, emprunteur, prévoyance et retraite. Comment puis-je vous aider aujourd'hui ?",
+      "documents_used": [
+        "Question: Bonjour\n\nRéponse:\nBonjour ! Je suis Julie, votre assistante CNP Assurances. Je suis là pou",
+        "Question: Bonsoir\n\nRéponse:\nBonsoir ! Je suis Julie, votre assistante virtuelle CNP Assurances. Je p"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:11:40.140821",
+    "execution_time_ms": 10631
+  },
+  {
+    "crm_action_id": "CRM-5F8FEC9F",
+    "interaction_id": "INT-2026-85C14925",
+    "customer_id": "CUST-1769699444",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " qui est ses impérences et quelles sont les histoires.",
+      "intent": "unknown"
+    },
+    "output_data": {
+      "response": "Mission: « Assurons un monde plus ouvert ». Raison d'être: Assureurs et investisseurs responsables, animés par la vocation citoyenne, nous agissons avec nos partenaires pour une société inclusive et durable en apportant au plus grand nombre des solutions qui protègent et facilitent tous les parcours... Y a-t-il autre chose que je puisse faire pour vous ?",
+      "documents_used": [
+        "Question: Quelle est la mission de CNP Assurances ?\n\nRéponse:\nMission: « Assurons un monde plus ouve",
+        "Question: Conseils pour rédiger clause bénéficiaire ?\n\nRéponse:\nÉlément important du contrat. Consei"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:11:52.854125",
+    "execution_time_ms": 12711
+  },
+  {
+    "crm_action_id": "CRM-033213E6",
+    "interaction_id": "INT-2026-85C14925",
+    "customer_id": "CUST-1769699444",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " C'est NP Assurance C'est NP Assurance c'est quoi ? Et qui est son histoire ?",
+      "intent": "general_info"
+    },
+    "output_data": {
+      "response": "Assurance Vie et Épargne, Assurance Emprunteur (crédits immobiliers et prêts personnels), Prévoyance et Santé (décès, invalidité, accidents, complémentaire santé), Retraite (PERP, PER, solutions Madelin). Distribution via partenaires: La Banque Postale, Groupe BPCE, Amétis, Banco Santander, Caixa Ec... Y a-t-il autre chose que je puisse faire pour vous ?",
+      "documents_used": [
+        "Question: Quels sont les domaines d'activité de CNP Assurances ?\n\nRéponse:\nAssurance Vie et Épargne,",
+        "Question: Qui est CNP Assurances ? Quelle est son histoire ?\n\nRéponse:\nCNP Assurances (Caisse Nation"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:12:05.380883",
+    "execution_time_ms": 12520
+  },
+  {
+    "crm_action_id": "CRM-11BAF46C",
+    "interaction_id": "INT-2026-85C14925",
+    "customer_id": "CUST-1769699444",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " Comment sera imposé le retrait de mon insurance V?",
+      "intent": "unknown"
+    },
+    "output_data": {
+      "response": "Impôt sur les produits seulement (pas le capital). Exonérations possibles après: licenciement, retraite anticipée, invalidité, liquidation judiciaire. Prélèvements sociaux toujours applicables sauf multi-supports + invalidité 2e/3e cat. Y a-t-il autre chose que je puisse faire pour vous ?",
+      "documents_used": [
+        "Question: Comment sera imposé le retrait de mon assurance vie ?\n\nRéponse:\nImpôt sur les produits seu",
+        "Question: Comment résilier/retirer mon assurance vie ?\n\nRéponse:\nPour l'assurance vie (épargne): Vou"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:12:17.190443",
+    "execution_time_ms": 11806
+  },
+  {
+    "crm_action_id": "CRM-A6E7CBAB",
+    "interaction_id": "INT-2026-85C14925",
+    "customer_id": "CUST-1769699444",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " Qu'est ce des paroles ? Comment faire un rassin ?",
+      "intent": "unknown"
+    },
+    "output_data": {
+      "response": "Bonjour ! Je suis Julie, votre assistante CNP Assurances. Je suis là pour répondre à vos questions sur vos contrats d'assurance vie, emprunteur, prévoyance et retraite. Comment puis-je vous aider aujourd'hui ?",
+      "documents_used": [
+        "Question: Bonjour\n\nRéponse:\nBonjour ! Je suis Julie, votre assistante CNP Assurances. Je suis là pou",
+        "Question: Bonsoir\n\nRéponse:\nBonsoir ! Je suis Julie, votre assistante virtuelle CNP Assurances. Je p"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:12:28.649593",
+    "execution_time_ms": 11452
+  },
+  {
+    "crm_action_id": "CRM-3C8940D7",
+    "interaction_id": "INT-2026-85C14925",
+    "customer_id": "CUST-1769699444",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " couverture 100 sur 100 ou 50 sur 100. Qu'est ce que cela signifie ?",
+      "intent": "general_info"
+    },
+    "output_data": {
+      "response": "Prêt garantit à 100% obligatoirement. Personne seule: 100%. Plusieurs emprunteurs: 50/50 (moitié du capital par assureur) ou 100/100 (totalité par assureur). Y a-t-il autre chose que je puisse faire pour vous ?",
+      "documents_used": [
+        "Question: Couverture 100/100 ou 50/50: qu'est-ce que cela signifie ?\n\nRéponse:\nPrêt garantit à 100% ",
+        "Question: Impact de mes 70 ans sur fiscalité assurance vie ?\n\nRéponse:\nPas d'impact en cas de rachat"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:12:43.548513",
+    "execution_time_ms": 14897
+  },
+  {
+    "crm_action_id": "CRM-56CDF8DE",
+    "interaction_id": "INT-2026-A1A7B0F0",
+    "customer_id": "CUST-1769699638",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " à retraite à la banque postale comme en liquider",
+      "intent": "unknown"
+    },
+    "output_data": {
+      "response": "Avec conseiller ou courrier CNP Assurances TSA 93847 NANTERRE Cedex 9 (+ identité, RIB, domicile, avis imposition). Pour PERP: choisissez rente individuelle ou réversible. Y a-t-il autre chose que je puisse faire pour vous ?",
+      "documents_used": [
+        "Question: À retraite à La Banque Postale: comment liquider ?\n\nRéponse:\nAvec conseiller ou courrier C",
+        "Question: À retraite Caisse d'Épargne: comment liquider ?\n\nRéponse:\nAvec conseiller ou courrier CNP "
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:14:10.554413",
+    "execution_time_ms": 12493
+  },
+  {
+    "crm_action_id": "CRM-01BC418C",
+    "interaction_id": "INT-2026-A1A7B0F0",
+    "customer_id": "CUST-1769699638",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " Bonjour",
+      "intent": "greeting"
+    },
+    "output_data": {
+      "response": "Bonjour ! Je suis Julie, votre assistante virtuelle CNP Assurances. Comment puis-je vous aider aujourd'hui ?",
+      "documents_used": [
+        "Question: Amétis: Comment faire un versement libre ?\n\nRéponse:\nEn ligne: monespaceclient.cnp.fr « Ve",
+        "Question: Bonsoir\n\nRéponse:\nBonsoir ! Je suis Julie, votre assistante virtuelle CNP Assurances. Je p"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:14:19.364329",
+    "execution_time_ms": 8809
+  },
+  {
+    "crm_action_id": "CRM-D7288D76",
+    "interaction_id": "INT-2026-A1A7B0F0",
+    "customer_id": "CUST-1769699638",
+    "action_type": "rag_response",
+    "input_data": {
+      "query": " On se rend de sa vie pour préparer ma retraite?",
+      "intent": "unknown"
+    },
+    "output_data": {
+      "response": "Oui! Vous pouvez: puiser à votre rythme, recevoir revenus réguliers par rachats programmés, convertir en rente viagère avec réversion. Plan d'Épargne Retraite (PER) avec avantages fiscaux. Y a-t-il autre chose que je puisse faire pour vous ?",
+      "documents_used": [
+        "Question: Assurance vie pour préparer ma retraite ?\n\nRéponse:\nOui! Vous pouvez: puiser à votre rythm",
+        "Question: Comment sera imposé le retrait de mon assurance vie ?\n\nRéponse:\nImpôt sur les produits seu"
+      ]
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:14:29.594240",
+    "execution_time_ms": 10210
+  },
+  {
+    "crm_action_id": "CRM-75DD0C24",
+    "interaction_id": "INT-2026-A1A7B0F0",
+    "customer_id": "CUST-1769699638",
+    "action_type": "human_handoff",
+    "input_data": {
+      "query": " Comment effectuer une réclamation auprès de CNP ?",
+      "intent": "complaint"
+    },
+    "output_data": {
+      "response": "Je vais vous transférer à un conseiller qui pourra mieux vous aider. Merci de patienter un instant.",
+      "documents_used": []
+    },
+    "success": true,
+    "error_message": null,
+    "executed_at": "2026-01-29T16:14:40.936989",
+    "execution_time_ms": 11342
+  }
+]

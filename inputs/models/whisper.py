@@ -16,7 +16,8 @@ class Whisper:
         inputs = self.processor(
             audio,
             sampling_rate=sr,
-            return_tensors="pt"
+            return_tensors="pt",
+            padding=True
         ).to(self.device)
 
         with torch.no_grad():
