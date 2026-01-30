@@ -47,7 +47,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
         data: [1200, 1100, 1400, 1300, metrics.avgResponseTime, 1000, 1150],
         backgroundColor: '#e4e4e7',
         hoverBackgroundColor: '#0d9488',
-        borderRadius: 6,
+        borderRadius: 10,
         borderSkipped: false,
       },
     ],
@@ -69,149 +69,158 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
     ],
   };
 
+  // Shared Figma-like card classes
+  const card =
+    'bg-white border border-ink-200/70 rounded-2xl shadow-[0_10px_30px_rgba(15,23,42,0.06)]';
+  const cardPad = 'px-6 py-5';
+
   return (
-    <div className="px-8 py-6 bg-ink-50 min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-display text-ink-900">Overview</h1>
-        <p className="text-body text-ink-500 mt-1">
-          Performance metrics for your support system
-        </p>
-      </div>
+    <div className="min-h-screen bg-ink-50">
+      <div className="px-8 py-6">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-display text-ink-900">Overview</h1>
+          <p className="text-body text-ink-500 mt-1">
+            Performance metrics for your support system
+          </p>
+        </div>
 
-      {/* Key Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <MetricCard
-          title="Interactions"
-          value={metrics.totalInteractions.toLocaleString()}
-          subtitle="Last 30 days"
-          trend="up"
-          trendValue="+12%"
-        />
+        {/* Key Metrics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <MetricCard
+            title="Interactions"
+            value={metrics.totalInteractions.toLocaleString()}
+            subtitle="Last 30 days"
+            trend="up"
+            trendValue="+12%"
+          />
 
-        <MetricCard
-          title="Success Rate"
-          value={formatPercentage(metrics.successRate)}
-          subtitle="Resolved successfully"
-          trend={metrics.successRate >= 80 ? 'up' : 'down'}
-          trendValue={metrics.successRate >= 80 ? '+2.1%' : '-1.5%'}
-        />
+          <MetricCard
+            title="Success Rate"
+            value={formatPercentage(metrics.successRate)}
+            subtitle="Resolved successfully"
+            trend={metrics.successRate >= 80 ? 'up' : 'down'}
+            trendValue={metrics.successRate >= 80 ? '+2.1%' : '-1.5%'}
+          />
 
-        <MetricCard
-          title="Handoff Rate"
-          value={formatPercentage(metrics.handoffRate)}
-          subtitle="Escalated to agents"
-          trend={metrics.handoffRate <= 30 ? 'up' : 'down'}
-          trendValue={metrics.handoffRate <= 30 ? '-3.2%' : '+4.1%'}
-        />
+          <MetricCard
+            title="Handoff Rate"
+            value={formatPercentage(metrics.handoffRate)}
+            subtitle="Escalated to agents"
+            trend={metrics.handoffRate <= 30 ? 'up' : 'down'}
+            trendValue={metrics.handoffRate <= 30 ? '-3.2%' : '+4.1%'}
+          />
 
-        <MetricCard
-          title="Satisfaction"
-          value={formatPercentage(metrics.customerSatisfaction)}
-          subtitle="From customer feedback"
-          trend={metrics.customerSatisfaction >= 80 ? 'up' : 'down'}
-          trendValue={metrics.customerSatisfaction >= 80 ? '+1.8%' : '-2.1%'}
-        />
-      </div>
+          <MetricCard
+            title="Satisfaction"
+            value={formatPercentage(metrics.customerSatisfaction)}
+            subtitle="From customer feedback"
+            trend={metrics.customerSatisfaction >= 80 ? 'up' : 'down'}
+            trendValue={metrics.customerSatisfaction >= 80 ? '+1.8%' : '-2.1%'}
+          />
+        </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <div className="lg:col-span-2 bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
-          <h3 className="text-title text-ink-900 mb-4">Satisfaction Trend</h3>
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+          <div className={`lg:col-span-2 ${card} ${cardPad}`}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-title text-ink-900">Satisfaction Trend</h3>
+              <span className="text-xs font-medium text-ink-500">
+                Last 4 weeks
+              </span>
+            </div>
+
+            <Chart
+              type="line"
+              data={satisfactionTrendData}
+              className="h-56"
+              options={{
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                      callback: (val: any) => `${val}%`,
+                    },
+                  },
+                },
+                plugins: {
+                  legend: {
+                    display: true,
+                    labels: {
+                      boxWidth: 10,
+                      boxHeight: 10,
+                    },
+                  },
+                },
+              }}
+            />
+          </div>
+
+          <div className={`${card} ${cardPad}`}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-title text-ink-900">Issues by Urgency</h3>
+              <span className="text-xs font-medium text-ink-500">Today</span>
+            </div>
+
+            <Chart
+              type="doughnut"
+              data={urgencyDistributionData}
+              className="h-56"
+              options={{
+                plugins: {
+                  legend: {
+                    position: 'bottom',
+                  },
+                },
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Response Time Chart */}
+        <div className={`${card} px-6 py-6 mb-8`}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-2xl bg-ink-100/70 flex items-center justify-center">
+                <Clock className="text-ink-700" size={18} />
+              </div>
+              <div>
+                <h3 className="text-title text-ink-900">Weekly Response Time</h3>
+                <p className="text-caption text-ink-500 mt-0.5">
+                  Avg: {formatTime(metrics.avgResponseTime)}
+                </p>
+              </div>
+            </div>
+
+            <span className="text-xs font-medium text-ink-500">Last 7 days</span>
+          </div>
+
           <Chart
-            type="line"
-            data={satisfactionTrendData}
-            className="h-56"
+            type="bar"
+            data={responseTimeData}
+            className="h-60 w-full"
             options={{
               scales: {
+                x: {
+                  // ✅ makes bars occupy more horizontal space per category
+                  categoryPercentage: 0.8,
+                  barPercentage: 0.95,
+                  grid: { display: false },
+                },
                 y: {
                   beginAtZero: true,
-                  max: 100,
-                  ticks: {
-                    callback: (val: any) => `${val}%`,
-                  },
                 },
               },
               plugins: {
-                legend: {
-                  display: true,
-                  labels: {
-                    boxWidth: 10,
-                    boxHeight: 10,
-                  },
-                },
+                legend: { display: false },
               },
             }}
           />
+
         </div>
-
-        <div className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
-          <h3 className="text-title text-ink-900 mb-4">Issues by Urgency</h3>
-          <Chart
-            type="doughnut"
-            data={urgencyDistributionData}
-            className="h-56"
-            options={{
-              plugins: {
-                legend: {
-                  position: 'bottom',
-                },
-              },
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Response Time Chart */}
-      <div className="bg-white border border-ink-200 rounded-xl p-6 shadow-sm mb-8">
-        <div className="flex items-center mb-4">
-          <Clock className="text-ink-600 mr-3" size={22} />
-          <h3 className="text-title text-ink-900">Weekly Response Time</h3>
-        </div>
-        <Chart
-          type="bar"
-          data={responseTimeData}
-          className="h-48"
-          options={{
-            scales: {
-              y: {
-                beginAtZero: true,
-              },
-            },
-            plugins: {
-              legend: { display: false },
-            },
-          }}
-        />
-      </div>
-
-      {/* System Health */}
-      <div className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
-        <h3 className="text-title text-ink-900 mb-5">System Health</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 border border-ink-200 rounded-lg">
-            <div className="flex items-center mb-2">
-              <CheckCircle className="text-positive mr-2" size={18} />
-              <span className="text-sm font-medium text-ink-900">Bot Performance</span>
-            </div>
-            <p className="text-caption text-ink-600">Operational</p>
-          </div>
-
-          <div className="p-4 border border-ink-200 rounded-lg">
-            <div className="flex items-center mb-2">
-              <Clock className="text-ink-600 mr-2" size={18} />
-              <span className="text-sm font-medium text-ink-900">Response Time</span>
-            </div>
-            <p className="text-caption text-ink-600">Stable</p>
-          </div>
-
-          <div className="p-4 border border-ink-200 rounded-lg">
-            <div className="flex items-center mb-2">
-              <AlertTriangle className="text-caution mr-2" size={18} />
-              <span className="text-sm font-medium text-ink-900">Queue Load</span>
-            </div>
-            <p className="text-caption text-ink-600">Moderate</p>
-          </div>
-        </div>
+        {/* bottom spacing */}
+        <div className="h-6" />
       </div>
     </div>
   );

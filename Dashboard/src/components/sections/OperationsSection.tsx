@@ -7,7 +7,6 @@ interface OperationsSectionProps {
 }
 const ms = (v?: number | null) => (typeof v === "number" ? v : 0);
 
-
 const OperationsSection: React.FC<OperationsSectionProps> = ({ interactions }) => {
   // Response time distribution
   const responseTimeRanges = {
@@ -46,11 +45,11 @@ const OperationsSection: React.FC<OperationsSectionProps> = ({ interactions }) =
 
   Object.keys(urgencyStats).forEach(urgency => {
     const stats = urgencyStats[urgency];
-    stats.avgTime = stats.totalTime / stats.count;
+    stats.avgTime = stats.count ? stats.totalTime / stats.count : 0;
   });
 
   // System confidence levels
-  const avgConfidence = interactions.reduce((sum, i) => sum + i.confidence, 0) / interactions.length;
+  const avgConfidence = interactions.reduce((sum, i) => sum + i.confidence, 0) / (interactions.length || 1);
   const confidenceTrend = [
     { period: 'Last Hour', confidence: 0.92 },
     { period: 'Last 4 Hours', confidence: 0.89 },
@@ -59,111 +58,290 @@ const OperationsSection: React.FC<OperationsSectionProps> = ({ interactions }) =
   ];
 
   const formatTime = (seconds: number): string => {
+    if (!Number.isFinite(seconds) || seconds <= 0) return '—';
     if (seconds < 60) return `${Math.round(seconds)}s`;
     if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${Math.round(seconds % 60)}s`;
     return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
   };
 
-  const getUrgencyColor = (urgency: string): string => {
-    switch (urgency) {
-      case 'critical': return 'text-red-600 bg-red-100';
-      case 'high': return 'text-orange-600 bg-orange-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
-      case 'low': return 'text-green-600 bg-green-100';
-      default: return 'text-gray-600 bg-gray-100';
+  const badge = (tone: 'green' | 'red' | 'amber' | 'gray' | 'blue') => {
+    switch (tone) {
+      case 'green':
+        return 'bg-positive/10 text-positive border-positive/15';
+      case 'red':
+        return 'bg-negative/10 text-negative border-negative/15';
+      case 'amber':
+        return 'bg-caution/12 text-caution border-caution/20';
+      case 'blue':
+        return 'bg-sky-500/10 text-sky-700 border-sky-500/15';
+      default:
+        return 'bg-ink-100/70 text-ink-600 border-ink-200/70';
     }
   };
 
-  const getResponseTimeColor = (range: string): string => {
-    switch (range) {
-      case 'Fast (<1s)': return 'bg-green-500';
-      case 'Good (1-2s)': return 'bg-blue-500';
-      case 'Slow (2-5s)': return 'bg-yellow-500';
-      case 'Very Slow (>5s)': return 'bg-red-500';
-      default: return 'bg-gray-500';
+  const getUrgencyTone = (urgency: string) => {
+    switch (urgency) {
+      case 'critical':
+        return badge('red');
+      case 'high':
+        return badge('amber');
+      case 'medium':
+        return badge('blue');
+      case 'low':
+        return badge('green');
+      default:
+        return badge('gray');
     }
   };
+
+  const getResponseTimeTone = (range: string): string => {
+    switch (range) {
+      case 'Fast (<1s)':
+        return 'bg-positive';
+      case 'Good (1-2s)':
+        return 'bg-sky-600';
+      case 'Slow (2-5s)':
+        return 'bg-caution';
+      case 'Very Slow (>5s)':
+        return 'bg-negative';
+      default:
+        return 'bg-ink-400';
+    }
+  };
+
+  const card =
+    'bg-white border border-ink-200/70 rounded-2xl shadow-[0_10px_30px_rgba(15,23,42,0.06)]';
+
+  const avgRespSec =
+    interactions.length
+      ? interactions.reduce((sum, i) => sum + ms(i.execution_time_ms), 0) / interactions.length / 1000
+      : 0;
+
+  const totalHandoffs = interactions.filter(i => i.is_handoff).length;
+  const peakLoad = Math.max(...hourlyVolume.map(h => h.count));
 
   return (
-    <div className="p-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
-          Operational Performance
-        </h1>
-        <p className="text-gray-600">System efficiency, resource allocation, and performance metrics</p>
-      </div>
-
-      {/* Key Performance Indicators */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg p-6 card-shadow">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-500">Avg Response Time</h3>
-            <Clock className="text-blue-500" size={20} />
-          </div>
-          <div className="text-2xl font-bold text-gray-900 mb-1">
-            {(interactions.reduce((sum, i) => sum + ms(i.execution_time_ms), 0) / interactions.length / 1000).toFixed(2)}s
-          </div>
-          <p className="text-xs text-green-600">-12% from last week</p>
+    <div className="min-h-screen bg-ink-50">
+      <div className="px-8 py-6">
+        <div className="mb-8">
+          <h1 className="text-display text-ink-900">Operational Performance</h1>
+          <p className="text-body text-ink-500 mt-1">
+            System efficiency, resource allocation, and performance metrics
+          </p>
         </div>
 
-        <div className="bg-white rounded-lg p-6 card-shadow">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-500">System Confidence</h3>
-            <TrendingUp className="text-green-500" size={20} />
+        {/* Key Performance Indicators */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className={`${card} px-6 py-5`}>
+            <div className="flex items-start justify-between">
+              <span className="text-label text-ink-500 tracking-wide">Avg Response Time</span>
+              <div className="h-10 w-10 rounded-2xl bg-sky-500/10 flex items-center justify-center">
+                <Clock className="text-sky-700" size={18} />
+              </div>
+            </div>
+            <div className="mt-3 text-3xl font-semibold text-ink-900">
+              {avgRespSec.toFixed(2)}s
+            </div>
+            <p className="text-caption text-ink-500 mt-2">Based on execution_time_ms</p>
           </div>
-          <div className="text-2xl font-bold text-gray-900 mb-1">
-            {(avgConfidence * 100).toFixed(1)}%
+
+          <div className={`${card} px-6 py-5`}>
+            <div className="flex items-start justify-between">
+              <span className="text-label text-ink-500 tracking-wide">System Confidence</span>
+              <div className="h-10 w-10 rounded-2xl bg-positive/10 flex items-center justify-center">
+                <TrendingUp className="text-positive" size={18} />
+              </div>
+            </div>
+            <div className="mt-3 text-3xl font-semibold text-ink-900">
+              {(avgConfidence * 100).toFixed(1)}%
+            </div>
+            <p className="text-caption text-ink-500 mt-2">Average confidence score</p>
           </div>
-          <p className="text-xs text-green-600">+3% from last week</p>
+
+          <div className={`${card} px-6 py-5`}>
+            <div className="flex items-start justify-between">
+              <span className="text-label text-ink-500 tracking-wide">Total Handoffs</span>
+              <div className="h-10 w-10 rounded-2xl bg-caution/12 flex items-center justify-center">
+                <AlertTriangle className="text-caution" size={18} />
+              </div>
+            </div>
+            <div className="mt-3 text-3xl font-semibold text-ink-900">
+              {totalHandoffs}
+            </div>
+            <p className="text-caption text-ink-500 mt-2">Interactions escalated</p>
+          </div>
+
+          <div className={`${card} px-6 py-5`}>
+            <div className="flex items-start justify-between">
+              <span className="text-label text-ink-500 tracking-wide">Peak Load</span>
+              <div className="h-10 w-10 rounded-2xl bg-violet-500/10 flex items-center justify-center">
+                <BarChart3 className="text-violet-700" size={18} />
+              </div>
+            </div>
+            <div className="mt-3 text-3xl font-semibold text-ink-900">
+              {peakLoad}
+            </div>
+            <p className="text-caption text-ink-500 mt-2">interactions/hour (mock)</p>
+          </div>
         </div>
 
-        <div className="bg-white rounded-lg p-6 card-shadow">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-500">Total Handoffs</h3>
-            <AlertTriangle className="text-orange-500" size={20} />
-          </div>
-          <div className="text-2xl font-bold text-gray-900 mb-1">
-            {interactions.filter(i => i.is_handoff).length}
-          </div>
-          <p className="text-xs text-red-600">+2 from yesterday</p>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+          {/* Response Time Distribution */}
+          <div className={`${card} px-6 py-5`}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-2xl bg-sky-500/10 flex items-center justify-center">
+                <Activity className="text-sky-700" size={18} />
+              </div>
+              <div>
+                <h3 className="text-title text-ink-900">Response Time Distribution</h3>
+                <p className="text-caption text-ink-500 mt-0.5">Share of interactions by latency</p>
+              </div>
+            </div>
 
-        <div className="bg-white rounded-lg p-6 card-shadow">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-medium text-gray-500">Peak Load</h3>
-            <BarChart3 className="text-purple-500" size={20} />
-          </div>
-          <div className="text-2xl font-bold text-gray-900 mb-1">
-            {Math.max(...hourlyVolume.map(h => h.count))}
-          </div>
-          <p className="text-xs text-gray-600">interactions/hour</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        {/* Response Time Distribution */}
-        <div className="bg-white rounded-lg p-6 card-shadow">
-          <div className="flex items-center mb-4">
-            <Activity className="text-blue-500 mr-2" size={20} />
-            <h3 className="text-lg font-semibold text-gray-900">Response Time Distribution</h3>
-          </div>
-          <div className="space-y-3">
-            {Object.entries(responseTimeRanges).map(([range, count]) => {
-              const percentage = (count / interactions.length) * 100;
-              return (
-                <div key={range} className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className={`w-3 h-3 rounded-full mr-3 ${getResponseTimeColor(range)}`}></div>
-                    <span className="text-sm font-medium text-gray-700">{range}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-24 bg-gray-200 rounded-full h-2 mr-3">
-                      <div 
-                        className={`h-2 rounded-full ${getResponseTimeColor(range)}`}
-                        style={{ width: `${percentage}%` }}
-                      ></div>
+            <div className="space-y-3">
+              {Object.entries(responseTimeRanges).map(([range, count]) => {
+                const percentage = interactions.length ? (count / interactions.length) * 100 : 0;
+                return (
+                  <div key={range} className="flex items-center justify-between gap-4">
+                    <div className="flex items-center min-w-0">
+                      <div className={`w-2.5 h-2.5 rounded-full mr-3 ${getResponseTimeTone(range)}`} />
+                      <span className="text-sm font-semibold text-ink-700 truncate">{range}</span>
                     </div>
-                    <span className="text-sm text-gray-600 w-8 text-right">{count}</span>
+
+                    <div className="flex items-center gap-3">
+                      <div className="w-28 bg-ink-100 rounded-full h-2 overflow-hidden">
+                        <div
+                          className={`h-2 rounded-full ${getResponseTimeTone(range)}`}
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                      <span className="text-sm text-ink-500 w-10 text-right">{count}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Handoff Reasons */}
+          <div className={`${card} px-6 py-5`}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-2xl bg-caution/12 flex items-center justify-center">
+                <AlertTriangle className="text-caution" size={18} />
+              </div>
+              <div>
+                <h3 className="text-title text-ink-900">Handoff Reasons</h3>
+                <p className="text-caption text-ink-500 mt-0.5">Top reasons for escalation</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {Object.entries(handoffReasons)
+                .sort(([, a], [, b]) => b - a)
+                .map(([reason, count]) => {
+                  const total = Object.values(handoffReasons).reduce((a, b) => a + b, 0) || 1;
+                  const percentage = (count / total) * 100;
+
+                  return (
+                    <div key={reason} className="flex items-center justify-between gap-4">
+                      <span className="text-sm font-semibold text-ink-700 capitalize min-w-0 truncate">
+                        {reason.replace('_', ' ')}
+                      </span>
+
+                      <div className="flex items-center gap-3">
+                        <div className="w-28 bg-ink-100 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="h-2 bg-caution rounded-full"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                        <span className="text-sm text-ink-500 w-10 text-right">{count}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+
+              {Object.keys(handoffReasons).length === 0 && (
+                <div className="text-sm text-ink-500">No handoff reasons available.</div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Resolution Time by Urgency */}
+        <div className={`${card} px-6 py-5 mb-8`}>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-title text-ink-900">Resolution Time by Urgency</h3>
+              <p className="text-caption text-ink-500 mt-1">Average resolution time per urgency bucket</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {Object.entries(urgencyStats)
+              .sort(([a], [b]) => {
+                const order = { critical: 0, high: 1, medium: 2, low: 3 };
+                return (order as any)[a] - (order as any)[b];
+              })
+              .map(([urgency, stats]) => (
+                <div
+                  key={urgency}
+                  className="rounded-2xl border border-ink-200/70 bg-white px-5 py-4 hover:shadow-[0_12px_30px_rgba(15,23,42,0.08)] transition-subtle"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold capitalize ${getUrgencyTone(urgency)}`}>
+                      {urgency}
+                    </span>
+                    <span className="text-sm text-ink-500">{stats.count} tickets</span>
+                  </div>
+
+                  <div className="text-xl font-semibold text-ink-900">
+                    {formatTime(stats.avgTime)}
+                  </div>
+                  <p className="text-caption text-ink-500 mt-1">Average resolution time</p>
+                </div>
+              ))}
+          </div>
+        </div>
+
+        {/* System Confidence Trend */}
+        <div className={`${card} px-6 py-5`}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-10 w-10 rounded-2xl bg-positive/10 flex items-center justify-center">
+              <TrendingUp className="text-positive" size={18} />
+            </div>
+            <div>
+              <h3 className="text-title text-ink-900">System Confidence Trend</h3>
+              <p className="text-caption text-ink-500 mt-0.5">Confidence across recent periods</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {confidenceTrend.map((period) => {
+              const confidencePercentage = period.confidence * 100;
+
+              const tone =
+                confidencePercentage >= 90 ? 'green' : confidencePercentage >= 80 ? 'amber' : 'red';
+
+              return (
+                <div key={period.period} className="flex items-center justify-between gap-4">
+                  <span className="text-sm font-medium text-ink-600">{period.period}</span>
+
+                  <div className="flex items-center gap-3">
+                    <div className="w-40 bg-ink-100 rounded-full h-2 overflow-hidden">
+                      <div
+                        className={`h-2 rounded-full ${
+                          tone === 'green' ? 'bg-positive' : tone === 'amber' ? 'bg-caution' : 'bg-negative'
+                        }`}
+                        style={{ width: `${confidencePercentage}%` }}
+                      />
+                    </div>
+
+                    <span className={`text-sm font-semibold w-14 text-right ${
+                      tone === 'green' ? 'text-positive' : tone === 'amber' ? 'text-caution' : 'text-negative'
+                    }`}>
+                      {confidencePercentage.toFixed(1)}%
+                    </span>
                   </div>
                 </div>
               );
@@ -171,96 +349,7 @@ const OperationsSection: React.FC<OperationsSectionProps> = ({ interactions }) =
           </div>
         </div>
 
-        {/* Handoff Reasons */}
-        <div className="bg-white rounded-lg p-6 card-shadow">
-          <div className="flex items-center mb-4">
-            <AlertTriangle className="text-orange-500 mr-2" size={20} />
-            <h3 className="text-lg font-semibold text-gray-900">Handoff Reasons</h3>
-          </div>
-          <div className="space-y-3">
-            {Object.entries(handoffReasons)
-              .sort(([, a], [, b]) => b - a)
-              .map(([reason, count]) => {
-                const percentage = (count / Object.values(handoffReasons).reduce((a, b) => a + b, 0)) * 100;
-                return (
-                  <div key={reason} className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700 capitalize">
-                      {reason.replace('_', ' ')}
-                    </span>
-                    <div className="flex items-center">
-                      <div className="w-20 bg-gray-200 rounded-full h-2 mr-3">
-                        <div 
-                          className="h-2 bg-orange-500 rounded-full"
-                          style={{ width: `${percentage}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm text-gray-600 w-8 text-right">{count}</span>
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
-        </div>
-      </div>
-
-      {/* Resolution Time by Urgency */}
-      <div className="bg-white rounded-lg p-6 card-shadow mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Resolution Time by Urgency</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Object.entries(urgencyStats)
-            .sort(([a], [b]) => {
-              const order = { 'critical': 0, 'high': 1, 'medium': 2, 'low': 3 };
-              return order[a as keyof typeof order] - order[b as keyof typeof order];
-            })
-            .map(([urgency, stats]) => (
-              <div key={urgency} className="p-4 border border-gray-200 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className={`px-2 py-1 rounded text-xs font-medium capitalize ${getUrgencyColor(urgency)}`}>
-                    {urgency}
-                  </span>
-                  <span className="text-sm text-gray-600">{stats.count} tickets</span>
-                </div>
-                <div className="text-lg font-bold text-gray-900 mb-1">
-                  {formatTime(stats.avgTime)}
-                </div>
-                <p className="text-xs text-gray-600">Average resolution time</p>
-              </div>
-            ))}
-        </div>
-      </div>
-
-      {/* System Confidence Trend */}
-      <div className="bg-white rounded-lg p-6 card-shadow">
-        <div className="flex items-center mb-4">
-          <TrendingUp className="text-green-500 mr-2" size={20} />
-          <h3 className="text-lg font-semibold text-gray-900">System Confidence Trend</h3>
-        </div>
-        <div className="space-y-4">
-          {confidenceTrend.map((period) => {
-            const confidencePercentage = period.confidence * 100;
-            const confidenceColor = confidencePercentage >= 90 ? 'text-green-600' : 
-                                   confidencePercentage >= 80 ? 'text-yellow-600' : 'text-red-600';
-            return (
-              <div key={period.period} className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">{period.period}</span>
-                <div className="flex items-center">
-                  <div className="w-32 bg-gray-200 rounded-full h-3 mr-3">
-                    <div 
-                      className={`h-3 rounded-full ${
-                        confidencePercentage >= 90 ? 'bg-green-500' :
-                        confidencePercentage >= 80 ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}
-                      style={{ width: `${confidencePercentage}%` }}
-                    ></div>
-                  </div>
-                  <span className={`text-sm font-medium w-12 text-right ${confidenceColor}`}>
-                    {confidencePercentage.toFixed(1)}%
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <div className="h-6" />
       </div>
     </div>
   );

@@ -1,5 +1,11 @@
 import React from 'react';
-import { BarChart3, Users, MessageSquare, Heart, TrendingUp, Settings, Menu } from 'lucide-react';
+import {
+  BarChart3,
+  Users,
+  MessageSquare,
+  Heart,
+  TrendingUp,
+} from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
@@ -16,55 +22,88 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
   ];
 
   return (
-    <aside className="w-20 bg-slate-900 h-full flex flex-col items-center py-4">
+    <aside
+      className={[
+        // Mobile collapsed / Desktop expanded
+        'h-full flex flex-col',
+        'w-[72px] md:w-[260px]',
+        'bg-[#243248] py-6',
+        'shadow-[inset_-1px_0_0_rgba(255,255,255,0.06)]',
+      ].join(' ')}
+    >
       {/* Brand */}
-      <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center mb-6">
-        <span className="text-white font-semibold text-lg">V</span>
+      <div className="px-4 md:px-5 mb-8">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center">
+            <span className="text-white font-semibold text-lg leading-none">
+
+
+            </span>
+          </div>
+
+          {/* hide on mobile */}
+          <div className="hidden md:block">
+            <div className="text-white font-semibold leading-tight">AI Dreamer</div>
+            <div className="text-white/60 text-xs mt-0.5">Callbot Dashboard</div>
+          </div>
+        </div>
       </div>
 
       {/* Main nav */}
-      <nav className="flex-1 w-full flex flex-col items-center gap-2">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
+      <nav className="flex-1 px-3 md:px-4">
+        <div className="flex flex-col gap-1.5">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
 
-          return (
-            <button
-              key={item.id}
-              onClick={() => onTabChange(item.id)}
-              title={item.label}
-              className={[
-                'w-12 h-12 rounded-2xl flex items-center justify-center transition-all',
-                isActive
-                  ? 'bg-violet-600 shadow-md'
-                  : 'bg-transparent hover:bg-slate-800',
-              ].join(' ')}
-            >
-              <Icon
-                size={22}
-                className={isActive ? 'text-white' : 'text-slate-300'}
-              />
-            </button>
-          );
-        })}
+            return (
+              <button
+                key={item.id}
+                onClick={() => onTabChange(item.id)}
+                title={item.label}
+                aria-label={item.label}
+                className={[
+                  'relative w-full h-11 rounded-2xl',
+                  'flex items-center',
+                  'px-3 md:px-3.5',
+                  'transition-all',
+                  isActive ? 'bg-white/10' : 'hover:bg-white/8',
+                ].join(' ')}
+              >
+                {/* active left bar (desktop only looks best, but keep it always) */}
+                <span
+                  className={[
+                    'absolute left-0 top-1/2 -translate-y-1/2',
+                    'h-6 w-1 rounded-full',
+                    isActive ? 'bg-[#6D5EF3]' : 'bg-transparent',
+                  ].join(' ')}
+                />
+
+                {/* Icon */}
+                <div
+                  className={[
+                    'w-10 h-10 rounded-2xl flex items-center justify-center',
+                    isActive ? 'bg-[#6D5EF3] shadow-[0_10px_25px_rgba(109,94,243,0.35)]' : 'bg-transparent',
+                  ].join(' ')}
+                >
+                  <Icon size={20} className={isActive ? 'text-white' : 'text-white/70'} />
+                </div>
+
+                {/* Label (hidden on mobile) */}
+                <div className="hidden md:flex flex-col items-start ml-3 min-w-0">
+                  <span className={['text-sm font-semibold truncate', isActive ? 'text-white' : 'text-white/80'].join(' ')}>
+                    {item.label}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </nav>
 
-      {/* Bottom actions (like the Figma screens) */}
-      <div className="w-full flex flex-col items-center gap-2 pb-3">
-        <button
-          className="w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-slate-800 transition-all"
-          title="Settings"
-          onClick={() => onTabChange('overview')} // change if you have a settings tab later
-        >
-          <Settings size={22} className="text-slate-300" />
-        </button>
-
-        <button
-          className="w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-slate-800 transition-all"
-          title="Menu"
-        >
-          <Menu size={22} className="text-slate-300" />
-        </button>
+      {/* Divider */}
+      <div className="px-4 md:px-5 my-4">
+        <div className="h-px bg-white/10" />
       </div>
     </aside>
   );

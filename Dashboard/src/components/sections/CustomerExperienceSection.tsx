@@ -41,6 +41,24 @@ const CustomerExperienceSection: React.FC<CustomerExperienceSectionProps> = ({ i
   const [byIntentRows, setByIntentRows] = useState<SatisfactionByIntentRow[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const card =
+    'bg-white border border-ink-200/70 rounded-2xl shadow-[0_10px_30px_rgba(15,23,42,0.06)]';
+
+  const badge = (tone: 'green' | 'red' | 'gray' | 'amber' | 'blue') => {
+    switch (tone) {
+      case 'green':
+        return 'bg-positive/10 text-positive border-positive/15';
+      case 'red':
+        return 'bg-negative/10 text-negative border-negative/15';
+      case 'amber':
+        return 'bg-caution/12 text-caution border-caution/20';
+      case 'blue':
+        return 'bg-sky-500/10 text-sky-700 border-sky-500/15';
+      default:
+        return 'bg-ink-100/70 text-ink-600 border-ink-200/70';
+    }
+  };
+
   // Emotion distribution (from interactions)
   const emotionCounts = useMemo(() => {
     return interactions.reduce((acc, interaction) => {
@@ -260,7 +278,7 @@ const CustomerExperienceSection: React.FC<CustomerExperienceSectionProps> = ({ i
         return {
           ...r,
           satisfaction_rate_pct: rate,
-          status: rate >= 80 ? '✅ Excellent' : rate >= 60 ? '⚠️ Acceptable' : '❌ Needs work',
+          status: rate >= 80 ? 'Excellent' : rate >= 60 ? 'Acceptable' : 'Needs work',
         };
       })
       .sort((a, b) => a.satisfaction_rate_pct - b.satisfaction_rate_pct);
@@ -275,64 +293,163 @@ const CustomerExperienceSection: React.FC<CustomerExperienceSectionProps> = ({ i
     : fallbackSatisfaction.feedbackRate;
 
   return (
-    <div className="px-8 py-6 bg-ink-50 min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-display text-ink-900">Customer Experience</h1>
-        <p className="text-body text-ink-500 mt-1">Satisfaction, sentiment, and feedback quality signals</p>
-      </div>
-
-      {/* Top KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-label uppercase text-ink-500 tracking-wide">Satisfaction Rate</span>
-            <TrendingUp className="text-ink-600" size={18} />
-          </div>
-          <div className="mt-2 text-2xl font-semibold text-ink-900">{overallSatisfactionRate.toFixed(1)}%</div>
-          <p className="text-caption text-ink-500 mt-1">Based on satisfaction_score (1/2)</p>
+    <div className="min-h-screen bg-ink-50">
+      <div className="px-8 py-6">
+        <div className="mb-8">
+          <h1 className="text-display text-ink-900">Customer Experience</h1>
+          <p className="text-body text-ink-500 mt-1">
+            Satisfaction, sentiment, and feedback quality signals
+          </p>
         </div>
 
-        <div className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-label uppercase text-ink-500 tracking-wide">Feedback Collected</span>
-            <Heart className="text-ink-600" size={18} />
+        {/* Top KPIs */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className={`${card} px-6 py-5`}>
+            <div className="flex items-start justify-between">
+              <span className="text-label text-ink-500 tracking-wide">Satisfaction Rate</span>
+              <div className="h-10 w-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
+                <TrendingUp className="text-emerald-700" size={18} />
+              </div>
+            </div>
+            <div className="mt-3 text-3xl font-semibold text-ink-900">{overallSatisfactionRate.toFixed(1)}%</div>
+            <p className="text-caption text-ink-500 mt-2">Based on satisfaction_score (1/2)</p>
           </div>
-          <div className="mt-2 text-2xl font-semibold text-ink-900">{overallFeedbackRate.toFixed(1)}%</div>
-          <p className="text-caption text-ink-500 mt-1">Percent of interactions with feedback</p>
+
+          <div className={`${card} px-6 py-5`}>
+            <div className="flex items-start justify-between">
+              <span className="text-label text-ink-500 tracking-wide">Feedback Collected</span>
+              <div className="h-10 w-10 rounded-2xl bg-rose-500/10 flex items-center justify-center">
+                <Heart className="text-rose-700" size={18} />
+              </div>
+            </div>
+            <div className="mt-3 text-3xl font-semibold text-ink-900">{overallFeedbackRate.toFixed(1)}%</div>
+            <p className="text-caption text-ink-500 mt-2">Percent of interactions with feedback</p>
+          </div>
+
+          <div className={`${card} px-6 py-5`}>
+            <div className="flex items-start justify-between">
+              <span className="text-label text-ink-500 tracking-wide">Total Interactions</span>
+              <div className="h-10 w-10 rounded-2xl bg-sky-500/10 flex items-center justify-center">
+                <MessageSquare className="text-sky-700" size={18} />
+              </div>
+            </div>
+            <div className="mt-3 text-3xl font-semibold text-ink-900">{totalInteractions.toLocaleString()}</div>
+            <p className="text-caption text-ink-500 mt-2">From current loaded dataset</p>
+          </div>
         </div>
 
-        <div className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-label uppercase text-ink-500 tracking-wide">Total Interactions</span>
-            <MessageSquare className="text-ink-600" size={18} />
-          </div>
-          <div className="mt-2 text-2xl font-semibold text-ink-900">{totalInteractions.toLocaleString()}</div>
-          <p className="text-caption text-ink-500 mt-1">From current loaded dataset</p>
-        </div>
-      </div>
+        {/* Emotion + Trend */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+          <div className={`lg:col-span-1 ${card} px-6 py-5`}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-2xl bg-rose-500/10 flex items-center justify-center">
+                  <Heart className="text-rose-700" size={18} />
+                </div>
+                <div>
+                  <h3 className="text-title text-ink-900">Emotion Distribution</h3>
+                  <p className="text-caption text-ink-500 mt-0.5">From detected emotions</p>
+                </div>
+              </div>
+            </div>
 
-      {/* Emotion + Trend */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <div className="lg:col-span-1 bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
-          <div className="flex items-center mb-4">
-            <Heart className="text-ink-700 mr-2" size={18} />
-            <h3 className="text-title text-ink-900">Emotion Distribution</h3>
-          </div>
-
-          <div className="space-y-3">
-            {Object.entries(emotionCounts).map(([emotion, count]) => {
-              const percentage = totalInteractions ? (count / totalInteractions) * 100 : 0;
-              return (
-                <div key={emotion} className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className={`w-2.5 h-2.5 rounded-full mr-3 ${getEmotionColor(emotion)}`} />
-                    <span className="text-sm font-medium text-ink-700 capitalize">{emotion}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-28 bg-ink-100 rounded-full h-2 mr-3">
-                      <div className={`h-2 rounded-full ${getEmotionColor(emotion)}`} style={{ width: `${percentage}%` }} />
+            <div className="space-y-3">
+              {Object.entries(emotionCounts).map(([emotion, count]) => {
+                const percentage = totalInteractions ? (count / totalInteractions) * 100 : 0;
+                return (
+                  <div key={emotion} className="flex items-center justify-between gap-3">
+                    <div className="flex items-center min-w-0">
+                      <div className={`w-2.5 h-2.5 rounded-full mr-3 ${getEmotionColor(emotion)}`} />
+                      <span className="text-sm font-semibold text-ink-700 capitalize truncate">{emotion}</span>
                     </div>
-                    <span className="text-sm text-ink-500 w-10 text-right">{count}</span>
+
+                    <div className="flex items-center gap-3">
+                      <div className="w-28 bg-ink-100 rounded-full h-2 overflow-hidden">
+                        <div
+                          className={`h-2 rounded-full ${getEmotionColor(emotion)}`}
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                      <span className="text-sm text-ink-500 w-10 text-right">{count}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className={`lg:col-span-2 ${card} px-6 py-5`}>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-title text-ink-900">Satisfaction Trend</h3>
+                <p className="text-caption text-ink-500 mt-1">
+                  {loading ? 'Loading…' : 'Recent period'}
+                </p>
+              </div>
+            </div>
+
+            <Chart
+              type="line"
+              data={satisfactionTrendData as any}
+              className="h-64"
+              options={
+                {
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      max: 100,
+                      ticks: { callback: (v: any) => `${v}%` },
+                    },
+                  },
+                  plugins: {
+                    legend: { position: 'bottom' },
+                  },
+                } as any
+              }
+            />
+          </div>
+        </div>
+
+        {/* Channel Performance */}
+        <div className={`${card} px-6 py-5 mb-8`}>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-title text-ink-900">Channel Feedback Performance</h3>
+              <p className="text-caption text-ink-500 mt-1">Feedback rate and satisfaction by channel</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {Object.entries(channelFeedback).map(([channel, stats]) => {
+              const Icon = getChannelIcon(channel);
+              const satRate = stats.feedback ? (stats.satisfied / stats.feedback) * 100 : 0;
+              const fbRate = stats.total ? (stats.feedback / stats.total) * 100 : 0;
+
+              return (
+                <div key={channel} className="rounded-2xl border border-ink-200/70 bg-white px-5 py-4 hover:shadow-[0_12px_30px_rgba(15,23,42,0.08)] transition-subtle">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="h-10 w-10 rounded-2xl bg-ink-100/70 flex items-center justify-center">
+                      <Icon className="text-ink-700" size={18} />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-ink-900 capitalize">{channel}</div>
+                      <div className="text-caption text-ink-500">{stats.total} interactions</div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-ink-500">Feedback rate</span>
+                      <span className="font-semibold text-ink-900">{fbRate.toFixed(1)}%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-ink-500">Satisfaction</span>
+                      <span className="font-semibold text-ink-900">{satRate.toFixed(1)}%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-ink-500">Feedbacks</span>
+                      <span className="font-semibold text-ink-900">{stats.feedback}</span>
+                    </div>
                   </div>
                 </div>
               );
@@ -340,163 +457,127 @@ const CustomerExperienceSection: React.FC<CustomerExperienceSectionProps> = ({ i
           </div>
         </div>
 
-        <div className="lg:col-span-2 bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-title text-ink-900">Satisfaction Trend</h3>
-            <span className="text-caption text-ink-500">{loading ? 'Loading…' : 'Last days'}</span>
+        {/* Satisfaction by Intent */}
+        <div className={`${card} overflow-hidden mb-8`}>
+          <div className="px-6 py-5 border-b border-ink-200/70 bg-ink-50">
+            <h3 className="text-title text-ink-900">Satisfaction by Intent</h3>
+            <p className="text-caption text-ink-500 mt-1">Where customers feel happiest (and where to improve)</p>
           </div>
 
-          <Chart
-            type="line"
-            data={satisfactionTrendData as any}
-            className="h-64"
-            options={
-              {
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: { callback: (v: any) => `${v}%` },
-                  },
-                },
-                plugins: {
-                  legend: { position: 'bottom' },
-                },
-              } as any
-            }
-          />
-        </div>
-      </div>
-
-      {/* Channel Performance */}
-      <div className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm mb-8">
-        <h3 className="text-title text-ink-900 mb-4">Channel Feedback Performance</h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Object.entries(channelFeedback).map(([channel, stats]) => {
-            const Icon = getChannelIcon(channel);
-            const satRate = stats.feedback ? (stats.satisfied / stats.feedback) * 100 : 0;
-
-            return (
-              <div key={channel} className="p-4 border border-ink-200 rounded-lg">
-                <div className="flex items-center mb-2">
-                  <Icon className="text-ink-700 mr-2" size={16} />
-                  <span className="font-medium text-ink-900 capitalize">{channel}</span>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-ink-500">Interactions</span>
-                    <span className="font-medium text-ink-900">{stats.total}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-ink-500">Feedbacks</span>
-                    <span className="font-medium text-ink-900">{stats.feedback}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-ink-500">Satisfaction</span>
-                    <span className="font-medium text-ink-900">{satRate.toFixed(1)}%</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Satisfaction by Intent */}
-      <div className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm mb-8">
-        <h3 className="text-title text-ink-900 mb-4">Satisfaction by Intent</h3>
-
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-ink-200">
-                <th className="text-left py-3 px-4 font-medium text-ink-700">Intent</th>
-                <th className="text-left py-3 px-4 font-medium text-ink-700">Feedback Volume</th>
-                <th className="text-left py-3 px-4 font-medium text-ink-700">Satisfied</th>
-                <th className="text-left py-3 px-4 font-medium text-ink-700">Unsatisfied</th>
-                <th className="text-left py-3 px-4 font-medium text-ink-700">Satisfaction</th>
-                <th className="text-left py-3 px-4 font-medium text-ink-700">Status</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {intentTable.map(row => {
-                const rate = safeNum((row as any).satisfaction_rate_pct, 0);
-                const color = rate >= 80 ? 'text-emerald-700' : rate >= 60 ? 'text-amber-700' : 'text-rose-700';
-
-                return (
-                  <tr key={row.intent} className="border-b border-ink-100 hover:bg-ink-50">
-                    <td className="py-3 px-4">
-                      <span className="font-medium text-ink-900 capitalize">{row.intent.replace(/_/g, ' ')}</span>
-                    </td>
-                    <td className="py-3 px-4 text-ink-600">{(row as any).total_with_feedback}</td>
-                    <td className="py-3 px-4 text-ink-600">{(row as any).satisfied}</td>
-                    <td className="py-3 px-4 text-ink-600">{(row as any).unsatisfied}</td>
-                    <td className="py-3 px-4">
-                      <span className={`font-medium ${color}`}>{rate.toFixed(1)}%</span>
-                    </td>
-                    <td className="py-3 px-4 text-ink-600">{(row as any).status ?? '—'}</td>
-                  </tr>
-                );
-              })}
-
-              {!intentTable.length && (
-                <tr>
-                  <td className="py-6 px-4 text-ink-500" colSpan={6}>
-                    No satisfaction feedback yet.
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-ink-50">
+                <tr className="border-b border-ink-200/70">
+                  <th className="text-left py-3 px-6 text-xs font-semibold text-ink-600 uppercase tracking-wider">Intent</th>
+                  <th className="text-left py-3 px-6 text-xs font-semibold text-ink-600 uppercase tracking-wider">Feedback Volume</th>
+                  <th className="text-left py-3 px-6 text-xs font-semibold text-ink-600 uppercase tracking-wider">Satisfied</th>
+                  <th className="text-left py-3 px-6 text-xs font-semibold text-ink-600 uppercase tracking-wider">Unsatisfied</th>
+                  <th className="text-left py-3 px-6 text-xs font-semibold text-ink-600 uppercase tracking-wider">Satisfaction</th>
+                  <th className="text-left py-3 px-6 text-xs font-semibold text-ink-600 uppercase tracking-wider">Status</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+              </thead>
 
-      {/* Feedback Highlights */}
-      <div className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
-        <h3 className="text-title text-ink-900 mb-4">Feedback Highlights</h3>
+              <tbody className="divide-y divide-ink-100">
+                {intentTable.map(row => {
+                  const rate = safeNum((row as any).satisfaction_rate_pct, 0);
+                  const tone = rate >= 80 ? 'green' : rate >= 60 ? 'amber' : 'red';
+                  const statusTone = rate >= 80 ? 'green' : rate >= 60 ? 'blue' : 'amber';
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h4 className="font-medium text-emerald-700 mb-3">Satisfied</h4>
-            <div className="space-y-2">
-              {interactions
-                .filter(i => i.satisfaction_score === 1 && i.feedback_comment)
-                .slice(0, 3)
-                .map((interaction, idx) => (
-                  <div key={idx} className="p-3 bg-emerald-50 rounded border border-emerald-100">
-                    <p className="text-sm text-ink-800">"{interaction.feedback_comment}"</p>
-                    <p className="text-xs text-emerald-700 mt-1">Feedback: Satisfied (1)</p>
-                  </div>
-                ))}
+                  return (
+                    <tr key={row.intent} className="hover:bg-ink-50/70">
+                      <td className="py-4 px-6">
+                        <span className="font-semibold text-ink-900 capitalize">{row.intent.replace(/_/g, ' ')}</span>
+                      </td>
+                      <td className="py-4 px-6 text-ink-600">{(row as any).total_with_feedback}</td>
+                      <td className="py-4 px-6 text-ink-600">{(row as any).satisfied}</td>
+                      <td className="py-4 px-6 text-ink-600">{(row as any).unsatisfied}</td>
+                      <td className="py-4 px-6">
+                        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${badge(tone as any)}`}>
+                          {rate.toFixed(1)}%
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${badge(statusTone as any)}`}>
+                          {(row as any).status ?? '—'}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
 
-              {!interactions.some(i => i.satisfaction_score === 1 && i.feedback_comment) && (
-                <p className="text-sm text-ink-500">No satisfied feedback comments yet.</p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="font-medium text-rose-700 mb-3">Unsatisfied</h4>
-            <div className="space-y-2">
-              {interactions
-                .filter(i => i.satisfaction_score === 2 && i.feedback_comment)
-                .slice(0, 3)
-                .map((interaction, idx) => (
-                  <div key={idx} className="p-3 bg-rose-50 rounded border border-rose-100">
-                    <p className="text-sm text-ink-800">"{interaction.feedback_comment}"</p>
-                    <p className="text-xs text-rose-700 mt-1">Feedback: Unsatisfied (2)</p>
-                  </div>
-                ))}
-
-              {!interactions.some(i => i.satisfaction_score === 2 && i.feedback_comment) && (
-                <p className="text-sm text-ink-500">No unsatisfied feedback comments yet.</p>
-              )}
-            </div>
+                {!intentTable.length && (
+                  <tr>
+                    <td className="py-10 px-6 text-ink-500" colSpan={6}>
+                      No satisfaction feedback yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
+
+        {/* Feedback Highlights */}
+        <div className={`${card} px-6 py-5`}>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-title text-ink-900">Feedback Highlights</h3>
+            <span className="text-caption text-ink-500">Latest comments</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="font-semibold text-emerald-700 mb-3">Satisfied</h4>
+              <div className="space-y-3">
+                {interactions
+                  .filter(i => i.satisfaction_score === 1 && i.feedback_comment)
+                  .slice(0, 3)
+                  .map((interaction, idx) => (
+                    <div key={idx} className="rounded-2xl border border-emerald-200/60 bg-emerald-50/60 px-4 py-3">
+                      <p className="text-sm text-ink-800 leading-relaxed">
+                        “{interaction.feedback_comment}”
+                      </p>
+                      <div className="mt-2">
+                        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${badge('green')}`}>
+                          Satisfied (1)
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+
+                {!interactions.some(i => i.satisfaction_score === 1 && i.feedback_comment) && (
+                  <p className="text-sm text-ink-500">No satisfied feedback comments yet.</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-rose-700 mb-3">Unsatisfied</h4>
+              <div className="space-y-3">
+                {interactions
+                  .filter(i => i.satisfaction_score === 2 && i.feedback_comment)
+                  .slice(0, 3)
+                  .map((interaction, idx) => (
+                    <div key={idx} className="rounded-2xl border border-rose-200/60 bg-rose-50/60 px-4 py-3">
+                      <p className="text-sm text-ink-800 leading-relaxed">
+                        “{interaction.feedback_comment}”
+                      </p>
+                      <div className="mt-2">
+                        <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${badge('red')}`}>
+                          Unsatisfied (2)
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+
+                {!interactions.some(i => i.satisfaction_score === 2 && i.feedback_comment) && (
+                  <p className="text-sm text-ink-500">No unsatisfied feedback comments yet.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="h-6" />
       </div>
     </div>
   );
