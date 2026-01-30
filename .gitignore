@@ -1,3 +1,7 @@
 venv
 __pycache__/
 *.pyc
+cache/
+logs/
+.env
+tts_cache/

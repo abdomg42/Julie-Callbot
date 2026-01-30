@@ -22,7 +22,7 @@ except ImportError:
 # Add src directory to path for imports
 sys.path.insert(0, r'C:\Users\PC\projects\callbot\final\tool_router')
 
-from ..schemas import (
+from src.schemas import (
     IntentType,
     UrgencyLevel,
     EmotionType,
@@ -714,6 +714,234 @@ class DatabaseService:
                 """, (date,))
                 
                 return dict(cursor.fetchone())
+            finally:
+                cursor.close()
+                conn.close()
+
+    # =====================
+    # FEEDBACK / SATISFACTION
+    # =====================
+    
+    def update_satisfaction_score(
+        self,
+        interaction_id: str,
+        satisfaction_score: int,
+        feedback_metadata: dict = None
+    ) -> bool:
+        """
+        Enregistre le score de satisfaction du client.
+        
+        Args:
+            interaction_id: ID de l'interaction
+            satisfaction_score: 1 (Satisfait) ou 2 (Insatisfait)
+            feedback_metadata: Métadonnées supplémentaires
+            
+        Returns:
+            True si succès, False sinon
+        """
+        if satisfaction_score not in [1, 2]:
+            raise ValueError("satisfaction_score doit être 1 (Satisfait) ou 2 (Insatisfait)")
+        
+        if self.use_mock:
+            interactions = self._load_json(self.interactions_file)
+            for interaction in interactions:
+                if interaction["interaction_id"] == interaction_id:
+                    interaction["satisfaction_score"] = satisfaction_score
+                    interaction["updated_at"] = datetime.now().isoformat()
+                    if feedback_metadata:
+                        if "metadata" not in interaction:
+                            interaction["metadata"] = {}
+                        interaction["metadata"]["feedback"] = feedback_metadata
+                    break
+            self._save_json(self.interactions_file, interactions)
+            score_label = "✅ SATISFAIT" if satisfaction_score == 1 else "❌ INSATISFAIT"
+            print(f"   {score_label} - Score enregistré pour {interaction_id}")
+            return True
+        else:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute("""
+                    UPDATE callbot_interactions 
+                    SET 
+                        satisfaction_score = %s,
+                        metadata = COALESCE(metadata, '{}'::jsonb) || %s::jsonb,
+                        updated_at = NOW()
+                    WHERE interaction_id = %s
+                    RETURNING interaction_id
+                """, (
+                    satisfaction_score,
+                    Json(feedback_metadata or {}),
+                    interaction_id
+                ))
+                
+                conn.commit()
+                result = cursor.fetchone()
+                
+                if result:
+                    score_label = "✅ SATISFAIT" if satisfaction_score == 1 else "❌ INSATISFAIT"
+                    print(f"   {score_label} - Score enregistré pour {interaction_id}")
+                    return True
+                return False
+            finally:
+                cursor.close()
+                conn.close()
+    
+    def get_satisfaction_statistics(self, days: int = 7) -> dict:
+        """
+        Récupère les statistiques de satisfaction pour les derniers N jours.
+        
+        Returns:
+            {
+                "total_interactions": 100,
+                "feedbacks_collected": 85,
+                "satisfied": 72,
+                "unsatisfied": 13,
+                "satisfaction_rate": 84.7,
+                "feedback_rate": 85.0
+            }
+        """
+        if self.use_mock:
+            interactions = self._load_json(self.interactions_file)
+            
+            # Filtrer par période
+            from datetime import timedelta
+            cutoff_date = datetime.now() - timedelta(days=days)
+            
+            recent = []
+            for i in interactions:
+                try:
+                    created = datetime.fromisoformat(i.get("created_at", "2000-01-01"))
+                    if created >= cutoff_date:
+                        recent.append(i)
+                except:
+                    pass
+            
+            total = len(recent)
+            feedbacks = [i for i in recent if i.get("satisfaction_score")]
+            satisfied = [i for i in feedbacks if i.get("satisfaction_score") == 1]
+            unsatisfied = [i for i in feedbacks if i.get("satisfaction_score") == 2]
+            
+            return {
+                "total_interactions": total,
+                "feedbacks_collected": len(feedbacks),
+                "satisfied": len(satisfied),
+                "unsatisfied": len(unsatisfied),
+                "satisfaction_rate": round(100.0 * len(satisfied) / len(feedbacks), 2) if feedbacks else 0,
+                "feedback_rate": round(100.0 * len(feedbacks) / total, 2) if total else 0
+            }
+        else:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute("""
+                    SELECT 
+                        COUNT(*) as total,
+                        COUNT(satisfaction_score) as feedbacks,
+                        SUM(CASE WHEN satisfaction_score = 1 THEN 1 ELSE 0 END) as satisfied,
+                        SUM(CASE WHEN satisfaction_score = 2 THEN 1 ELSE 0 END) as unsatisfied
+                    FROM callbot_interactions
+                    WHERE created_at >= NOW() - INTERVAL '%s days'
+                """, (days,))
+                
+                result = cursor.fetchone()
+                if result:
+                    total, feedbacks, satisfied, unsatisfied = result
+                    feedbacks = feedbacks or 0
+                    satisfied = satisfied or 0
+                    unsatisfied = unsatisfied or 0
+                    
+                    return {
+                        "total_interactions": total or 0,
+                        "feedbacks_collected": feedbacks,
+                        "satisfied": satisfied,
+                        "unsatisfied": unsatisfied,
+                        "satisfaction_rate": round(100.0 * satisfied / feedbacks, 2) if feedbacks > 0 else 0,
+                        "feedback_rate": round(100.0 * feedbacks / total, 2) if total and total > 0 else 0
+                    }
+                
+                return {
+                    "total_interactions": 0,
+                    "feedbacks_collected": 0,
+                    "satisfied": 0,
+                    "unsatisfied": 0,
+                    "satisfaction_rate": 0,
+                    "feedback_rate": 0
+                }
+            finally:
+                cursor.close()
+                conn.close()
+    
+    def get_satisfaction_by_intent(self) -> list:
+        """
+        Récupère la satisfaction par type d'intention.
+        Utilise la vue v_satisfaction_by_intent.
+        """
+        if self.use_mock:
+            return [
+                {"intent": "contract_info", "total": 20, "satisfied": 18, "satisfaction_rate": 90.0, "status": "✅ Excellent"},
+                {"intent": "declare_claim", "total": 15, "satisfied": 12, "satisfaction_rate": 80.0, "status": "✅ Excellent"},
+                {"intent": "payment_issue", "total": 10, "satisfied": 6, "satisfaction_rate": 60.0, "status": "⚠️ Acceptable"},
+            ]
+        else:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute("SELECT * FROM v_satisfaction_by_intent")
+                
+                results = []
+                for row in cursor.fetchall():
+                    results.append({
+                        "intent": row[0],
+                        "total": row[1],
+                        "satisfied": row[2],
+                        "unsatisfied": row[3],
+                        "satisfaction_rate": float(row[4]) if row[4] else 0,
+                        "status": row[5]
+                    })
+                
+                return results
+            except Exception as e:
+                print(f"   ⚠️ Erreur get_satisfaction_by_intent: {e}")
+                return []
+            finally:
+                cursor.close()
+                conn.close()
+    
+    def get_satisfaction_by_action(self) -> list:
+        """
+        Récupère la satisfaction par type d'action (RAG vs Handoff).
+        Utilise la vue v_satisfaction_by_action.
+        """
+        if self.use_mock:
+            return [
+                {"action_taken": "rag_query", "total": 35, "satisfied": 28, "unsatisfied": 7, "satisfaction_rate": 80.0},
+                {"action_taken": "human_handoff", "total": 10, "satisfied": 9, "unsatisfied": 1, "satisfaction_rate": 90.0},
+            ]
+        else:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute("SELECT * FROM v_satisfaction_by_action")
+                
+                results = []
+                for row in cursor.fetchall():
+                    results.append({
+                        "action_taken": row[0],
+                        "total": row[1],
+                        "satisfied": row[2],
+                        "unsatisfied": row[3],
+                        "satisfaction_rate": float(row[4]) if row[4] else 0
+                    })
+                
+                return results
+            except Exception as e:
+                print(f"   ⚠️ Erreur get_satisfaction_by_action: {e}")
+                return []
             finally:
                 cursor.close()
                 conn.close()
