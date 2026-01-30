@@ -62,14 +62,14 @@ export interface DashboardMetrics {
   };
 }
 
-export interface AgentPerformance {
-  agent_name: string;
+
+export type AgentPerformance = {
+  agent_name: string; // now this is intent string
   interactions_handled: number;
   resolution_rate: number;
   avg_resolution_time: number;
   customer_satisfaction: number;
-  satisfied_rate_pct: number;     // 0..100
-  feedback_rate_pct: number;      // 0..100
-
+  satisfied_rate_pct?: number;
+  feedback_rate_pct?: number;
   top_handoff_reasons: { reason: string; count: number }[];
-}
+};

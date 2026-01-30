@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart3, Users, MessageSquare, Heart, TrendingUp } from 'lucide-react';
+import { BarChart3, Users, MessageSquare, Heart, TrendingUp, Settings, Menu } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
@@ -16,48 +16,57 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
   ];
 
   return (
-    <div className="w-56 bg-ink-900 h-full flex flex-col">
-      <div className="px-5 py-6">
-        <h1 className="text-lg font-semibold text-white tracking-tight">
-          CallBot
-        </h1>
-        <p className="text-xs text-ink-400 mt-0.5">Analytics</p>
+    <aside className="w-20 bg-slate-900 h-full flex flex-col items-center py-4">
+      {/* Brand */}
+      <div className="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center mb-6">
+        <span className="text-white font-semibold text-lg">V</span>
       </div>
-      
-      <nav className="flex-1 px-3 mt-2">
+
+      {/* Main nav */}
+      <nav className="flex-1 w-full flex flex-col items-center gap-2">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
-          
+
           return (
             <button
               key={item.id}
               onClick={() => onTabChange(item.id)}
-              className={`w-full flex items-center px-3 py-2.5 text-left rounded-md transition-subtle mb-1 ${
-                isActive 
-                  ? 'bg-ink-800 text-white' 
-                  : 'text-ink-400 hover:text-ink-200 hover:bg-ink-800/50'
-              }`}
+              title={item.label}
+              className={[
+                'w-12 h-12 rounded-2xl flex items-center justify-center transition-all',
+                isActive
+                  ? 'bg-violet-600 shadow-md'
+                  : 'bg-transparent hover:bg-slate-800',
+              ].join(' ')}
             >
-              <Icon 
-                size={18} 
-                className={`mr-3 ${
-                  isActive ? 'text-accent' : 'text-ink-500'
-                }`} 
+              <Icon
+                size={22}
+                className={isActive ? 'text-white' : 'text-slate-300'}
               />
-              <span className="text-sm font-medium">{item.label}</span>
             </button>
           );
         })}
       </nav>
-      
-      <div className="px-4 py-4 border-t border-ink-800">
-        <div className="flex items-center">
-          <div className="w-1.5 h-1.5 bg-positive rounded-full mr-2"></div>
-          <span className="text-xs text-ink-400">Systems operational</span>
-        </div>
+
+      {/* Bottom actions (like the Figma screens) */}
+      <div className="w-full flex flex-col items-center gap-2 pb-3">
+        <button
+          className="w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-slate-800 transition-all"
+          title="Settings"
+          onClick={() => onTabChange('overview')} // change if you have a settings tab later
+        >
+          <Settings size={22} className="text-slate-300" />
+        </button>
+
+        <button
+          className="w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-slate-800 transition-all"
+          title="Menu"
+        >
+          <Menu size={22} className="text-slate-300" />
+        </button>
       </div>
-    </div>
+    </aside>
   );
 };
 

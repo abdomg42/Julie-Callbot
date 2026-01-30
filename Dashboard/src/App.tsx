@@ -96,55 +96,56 @@ function App() {
   };
 
 
+
   const calculateAgentPerformance = (interactions: Interaction[]): AgentPerformance[] => {
-    const agentMap = new Map<string, Interaction[]>();
+    const map = new Map<string, Interaction[]>();
 
-    interactions.forEach(interaction => {
-      if (interaction.assigned_agent) {
-        const arr = agentMap.get(interaction.assigned_agent) ?? [];
-        arr.push(interaction);
-        agentMap.set(interaction.assigned_agent, arr);
-      }
-    });
+    // group by intent (bot capability)
+    for (const it of interactions) {
+      const key = it.intent || 'unknown_intent';
+      const arr = map.get(key) ?? [];
+      arr.push(it);
+      map.set(key, arr);
+    }
 
-    return Array.from(agentMap.entries()).map(([agent_name, agentInteractions]) => {
-      const total = agentInteractions.length || 1;
-      const resolved = agentInteractions.filter(i => i.success).length;
+    return Array.from(map.entries()).map(([intent, items]) => {
+      const total = items.length || 1;
 
-      const withTime = agentInteractions.filter(i => typeof i.resolution_time_seconds === 'number');
+      // "resolution" = successful interactions
+      // prefer success boolean if present, fallback to status
+      const resolvedCount = items.filter(i =>
+        typeof i.success === 'boolean' ? i.success : i.status === 'completed'
+      ).length;
+
+      const withTime = items.filter(i => typeof i.resolution_time_seconds === 'number');
       const avgResolutionTime = withTime.length
-        ? withTime.reduce((sum, i) => sum + (i.resolution_time_seconds ?? 0), 0) / withTime.length
+        ? withTime.reduce((s, i) => s + (i.resolution_time_seconds ?? 0), 0) / withTime.length
         : 0;
 
-      const feedback = agentInteractions.filter(
-        i => i.satisfaction_score === 1 || i.satisfaction_score === 2
-      );
-
+      // satisfaction_score: 1 satisfied, 2 unsatisfied
+      const feedback = items.filter(i => i.satisfaction_score === 1 || i.satisfaction_score === 2);
       const satisfied = feedback.filter(i => i.satisfaction_score === 1).length;
 
-      const satisfactionRate = feedback.length ? (satisfied / feedback.length) * 100 : 0;
+      const satisfiedRatePct = feedback.length ? (satisfied / feedback.length) * 100 : 0;
+      const feedbackRatePct = items.length ? (feedback.length / items.length) * 100 : 0;
 
-
-      const handoffReasons = agentInteractions
+      // keep handoff reasons (optional)
+      const handoffReasons = items
         .filter(i => i.is_handoff && i.handoff_reason)
         .reduce((acc, i) => {
-          const reason = i.handoff_reason!;
-          acc[reason] = (acc[reason] || 0) + 1;
+          const r = i.handoff_reason!;
+          acc[r] = (acc[r] || 0) + 1;
           return acc;
         }, {} as Record<string, number>);
 
-      const feedbackRatePct = total ? (feedback.length / total) * 100 : 0;
-
       return {
-        agent_name,
-        interactions_handled: agentInteractions.length,
-        resolution_rate: (resolved / total) * 100,
+        agent_name: intent, // <- IMPORTANT: agent_name now stores intent
+        interactions_handled: items.length,
+        resolution_rate: (resolvedCount / total) * 100,
         avg_resolution_time: avgResolutionTime,
-
-        // NEW (from satisfaction_score)
-        satisfied_rate_pct: satisfactionRate,
+        customer_satisfaction: satisfiedRatePct, // keep existing field for compatibility
+        satisfied_rate_pct: satisfiedRatePct,
         feedback_rate_pct: feedbackRatePct,
-
         top_handoff_reasons: Object.entries(handoffReasons)
           .map(([reason, count]) => ({ reason, count }))
           .sort((a, b) => b.count - a.count)
@@ -152,7 +153,6 @@ function App() {
       };
     });
   };
-
 
   const renderActiveSection = () => {
     if (loading) {
@@ -175,7 +175,7 @@ function App() {
       case 'overview':
         return dashboardMetrics ? <OverviewSection metrics={dashboardMetrics} /> : null;
       case 'agents':
-        return <AgentPerformanceSection agentData={agentPerformance} />;
+        return <AgentPerformanceSection agentData={agentPerformance} interactions={interactions} />;
       case 'conversations':
         return <ConversationQualitySection interactions={interactions} />;
       case 'experience':
