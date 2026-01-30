@@ -10,27 +10,29 @@ interface OverviewSectionProps {
 
 const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
   const formatTime = (ms: number): string => {
-    if (ms < 1000) return `${ms}ms`;
+    if (!Number.isFinite(ms)) return '—';
+    if (ms < 1000) return `${Math.round(ms)}ms`;
     if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
     return `${(ms / 60000).toFixed(1)}m`;
   };
 
   const formatPercentage = (value: number): string => {
+    if (!Number.isFinite(value)) return '—';
     return `${value.toFixed(1)}%`;
   };
 
-  // Sample data for charts
+  // Charts
   const satisfactionTrendData = {
     labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
     datasets: [
       {
-        label: 'Customer Satisfaction',
-        data: [4.2, 4.1, 4.4, metrics.customerSatisfaction],
+        label: 'Satisfaction Rate (%)',
+        data: [78, 81, 84, metrics.customerSatisfaction],
         borderColor: '#0d9488',
-        backgroundColor: 'rgba(13, 148, 136, 0.05)',
+        backgroundColor: 'rgba(13, 148, 136, 0.10)',
         borderWidth: 2,
         fill: true,
-        tension: 0.3,
+        tension: 0.35,
         pointRadius: 3,
         pointBackgroundColor: '#0d9488',
       },
@@ -45,7 +47,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
         data: [1200, 1100, 1400, 1300, metrics.avgResponseTime, 1000, 1150],
         backgroundColor: '#e4e4e7',
         hoverBackgroundColor: '#0d9488',
-        borderRadius: 4,
+        borderRadius: 6,
         borderSkipped: false,
       },
     ],
@@ -61,12 +63,7 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
           metrics.activeIssues.medium,
           metrics.activeIssues.low,
         ],
-        backgroundColor: [
-          '#dc2626',
-          '#d97706',
-          '#a1a1aa',
-          '#0d9488',
-        ],
+        backgroundColor: ['#dc2626', '#d97706', '#a1a1aa', '#0d9488'],
         borderWidth: 0,
       },
     ],
@@ -75,10 +72,10 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
   return (
     <div className="px-8 py-6 bg-ink-50 min-h-screen">
       <div className="mb-8">
-        <h1 className="text-display text-ink-900">
-          Overview
-        </h1>
-        <p className="text-body text-ink-500 mt-1">Performance metrics for your support system</p>
+        <h1 className="text-display text-ink-900">Overview</h1>
+        <p className="text-body text-ink-500 mt-1">
+          Performance metrics for your support system
+        </p>
       </div>
 
       {/* Key Metrics Grid */}
@@ -86,19 +83,19 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
         <MetricCard
           title="Interactions"
           value={metrics.totalInteractions.toLocaleString()}
-          subtitle="Last 24 hours"
+          subtitle="Last 30 days"
           trend="up"
           trendValue="+12%"
         />
-        
+
         <MetricCard
           title="Success Rate"
           value={formatPercentage(metrics.successRate)}
-          subtitle="Resolution success"
+          subtitle="Resolved successfully"
           trend={metrics.successRate >= 80 ? 'up' : 'down'}
           trendValue={metrics.successRate >= 80 ? '+2.1%' : '-1.5%'}
         />
-        
+
         <MetricCard
           title="Handoff Rate"
           value={formatPercentage(metrics.handoffRate)}
@@ -106,19 +103,19 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
           trend={metrics.handoffRate <= 30 ? 'up' : 'down'}
           trendValue={metrics.handoffRate <= 30 ? '-3.2%' : '+4.1%'}
         />
-        
+
         <MetricCard
-          title="Avg Response"
-          value={formatTime(metrics.avgResponseTime)}
-          subtitle="System response"
-          trend="down"
-          trendValue="-150ms"
+          title="Satisfaction"
+          value={formatPercentage(metrics.customerSatisfaction)}
+          subtitle="From customer feedback"
+          trend={metrics.customerSatisfaction >= 80 ? 'up' : 'down'}
+          trendValue={metrics.customerSatisfaction >= 80 ? '+1.8%' : '-2.1%'}
         />
       </div>
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <div className="lg:col-span-2 bg-white border border-ink-200 rounded-lg p-5">
+        <div className="lg:col-span-2 bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
           <h3 className="text-title text-ink-900 mb-4">Satisfaction Trend</h3>
           <Chart
             type="line"
@@ -128,14 +125,26 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
               scales: {
                 y: {
                   beginAtZero: true,
-                  max: 5,
+                  max: 100,
+                  ticks: {
+                    callback: (val: any) => `${val}%`,
+                  },
+                },
+              },
+              plugins: {
+                legend: {
+                  display: true,
+                  labels: {
+                    boxWidth: 10,
+                    boxHeight: 10,
+                  },
                 },
               },
             }}
           />
         </div>
 
-        <div className="bg-white border border-ink-200 rounded-lg p-5">
+        <div className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
           <h3 className="text-title text-ink-900 mb-4">Issues by Urgency</h3>
           <Chart
             type="doughnut"
@@ -153,10 +162,10 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
       </div>
 
       {/* Response Time Chart */}
-      <div className="bg-white rounded-xl p-6 shadow-xl border border-gray-100 mb-8">
+      <div className="bg-white border border-ink-200 rounded-xl p-6 shadow-sm mb-8">
         <div className="flex items-center mb-4">
-          <Clock className="text-indigo-500 mr-3" size={24} />
-          <h3 className="text-xl font-bold text-gray-900">Weekly Response Time</h3>
+          <Clock className="text-ink-600 mr-3" size={22} />
+          <h3 className="text-title text-ink-900">Weekly Response Time</h3>
         </div>
         <Chart
           type="bar"
@@ -168,36 +177,39 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
                 beginAtZero: true,
               },
             },
+            plugins: {
+              legend: { display: false },
+            },
           }}
         />
       </div>
 
-      {/* System Health - simplified */}
-      <div className="bg-white border border-ink-200 rounded-lg p-5">
+      {/* System Health */}
+      <div className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
         <h3 className="text-title text-ink-900 mb-5">System Health</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 border border-ink-200 rounded-md">
+          <div className="p-4 border border-ink-200 rounded-lg">
             <div className="flex items-center mb-2">
               <CheckCircle className="text-positive mr-2" size={18} />
               <span className="text-sm font-medium text-ink-900">Bot Performance</span>
             </div>
-            <p className="text-caption text-positive">Optimal</p>
+            <p className="text-caption text-ink-600">Operational</p>
           </div>
-          
-          <div className="p-4 border border-ink-200 rounded-md">
+
+          <div className="p-4 border border-ink-200 rounded-lg">
             <div className="flex items-center mb-2">
-              <Clock className="text-accent mr-2" size={18} />
+              <Clock className="text-ink-600 mr-2" size={18} />
               <span className="text-sm font-medium text-ink-900">Response Time</span>
             </div>
-            <p className="text-caption text-accent">Good</p>
+            <p className="text-caption text-ink-600">Stable</p>
           </div>
-          
-          <div className="p-4 border border-ink-200 rounded-md">
+
+          <div className="p-4 border border-ink-200 rounded-lg">
             <div className="flex items-center mb-2">
               <AlertTriangle className="text-caution mr-2" size={18} />
               <span className="text-sm font-medium text-ink-900">Queue Load</span>
             </div>
-            <p className="text-caption text-caution">Moderate</p>
+            <p className="text-caption text-ink-600">Moderate</p>
           </div>
         </div>
       </div>

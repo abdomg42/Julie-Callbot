@@ -5,14 +5,16 @@ import { Clock, AlertTriangle, Activity, BarChart3, TrendingUp } from 'lucide-re
 interface OperationsSectionProps {
   interactions: Interaction[];
 }
+const ms = (v?: number | null) => (typeof v === "number" ? v : 0);
+
 
 const OperationsSection: React.FC<OperationsSectionProps> = ({ interactions }) => {
   // Response time distribution
   const responseTimeRanges = {
-    'Fast (<1s)': interactions.filter(i => i.execution_time_ms < 1000).length,
-    'Good (1-2s)': interactions.filter(i => i.execution_time_ms >= 1000 && i.execution_time_ms < 2000).length,
-    'Slow (2-5s)': interactions.filter(i => i.execution_time_ms >= 2000 && i.execution_time_ms < 5000).length,
-    'Very Slow (>5s)': interactions.filter(i => i.execution_time_ms >= 5000).length,
+    'Fast (<1s)': interactions.filter(i => ms(i.execution_time_ms) < 1000).length,
+    'Good (1-2s)': interactions.filter(i => ms(i.execution_time_ms) >= 1000 && ms(i.execution_time_ms) < 2000).length,
+    'Slow (2-5s)': interactions.filter(i => ms(i.execution_time_ms) >= 2000 && ms(i.execution_time_ms) < 5000).length,
+    'Very Slow (>5s)': interactions.filter(i => ms(i.execution_time_ms) >= 5000).length,
   };
 
   // Handoff reasons analysis
@@ -99,7 +101,7 @@ const OperationsSection: React.FC<OperationsSectionProps> = ({ interactions }) =
             <Clock className="text-blue-500" size={20} />
           </div>
           <div className="text-2xl font-bold text-gray-900 mb-1">
-            {(interactions.reduce((sum, i) => sum + i.execution_time_ms, 0) / interactions.length / 1000).toFixed(2)}s
+            {(interactions.reduce((sum, i) => sum + ms(i.execution_time_ms), 0) / interactions.length / 1000).toFixed(2)}s
           </div>
           <p className="text-xs text-green-600">-12% from last week</p>
         </div>

@@ -1,70 +1,98 @@
-import type { Interaction, DashboardMetrics, AgentPerformance, ConversationMessage } from '../types/dashboard';
+import type { Interaction, ConversationMessage } from '../types/dashboard';
 
 // Mock conversation histories
 const conversationHistory1: ConversationMessage[] = [
   {
+    speaker: 'customer',
+    message_text: 'Hi, I need help with my order. It seems to be delayed.',
     timestamp: '2024-01-27T10:30:00Z',
-    sender: 'customer',
-    message: 'Hi, I need help with my order. It seems to be delayed.',
-    emotion: 'neutral'
+    detected_emotion: 'neutral',
+    confidence: 0.95,
+    message_id: 'MSG-001',
+    turn_number: 1
   },
   {
+    speaker: 'bot',
+    message_text: 'I understand you\'re concerned about your order delay. Let me check that for you right away. Could you please provide your order number?',
     timestamp: '2024-01-27T10:30:15Z',
-    sender: 'bot',
-    message: 'I understand you\'re concerned about your order delay. Let me check that for you right away. Could you please provide your order number?',
+    message_id: 'MSG-002',
+    turn_number: 2
   },
   {
+    speaker: 'customer',
+    message_text: 'It\'s ORDER-12345. This is really frustrating, I needed this by today.',
     timestamp: '2024-01-27T10:30:45Z',
-    sender: 'customer',
-    message: 'It\'s ORDER-12345. This is really frustrating, I needed this by today.',
-    emotion: 'frustrated'
+    detected_emotion: 'frustrated',
+    confidence: 0.88,
+    message_id: 'MSG-003',
+    turn_number: 3
   },
   {
+    speaker: 'agent',
+    message_text: 'I completely understand your frustration, and I sincerely apologize for this inconvenience. I\'ve located your order ORDER-12345, and I can see it was indeed delayed due to a warehouse issue. Let me see what expedited shipping options we can offer you at no extra cost.',
     timestamp: '2024-01-27T10:31:00Z',
-    sender: 'agent',
-    message: 'I completely understand your frustration, and I sincerely apologize for this inconvenience. I\'ve located your order ORDER-12345, and I can see it was indeed delayed due to a warehouse issue. Let me see what expedited shipping options we can offer you at no extra cost.',
+    message_id: 'MSG-004',
+    turn_number: 4
   },
   {
+    speaker: 'customer',
+    message_text: 'Okay, thank you for looking into this so quickly.',
     timestamp: '2024-01-27T10:32:00Z',
-    sender: 'customer',
-    message: 'Okay, thank you for looking into this so quickly.',
-    emotion: 'neutral'
+    detected_emotion: 'neutral',
+    confidence: 0.92,
+    message_id: 'MSG-005',
+    turn_number: 5
   },
   {
+    speaker: 'agent',
+    message_text: 'I\'ve arranged for overnight shipping at no charge, and your order will arrive tomorrow by 2 PM. I\'ve also applied a 20% discount to your account for the inconvenience. You\'ll receive a tracking number within the hour. Is there anything else I can help you with today?',
     timestamp: '2024-01-27T10:33:00Z',
-    sender: 'agent',
-    message: 'I\'ve arranged for overnight shipping at no charge, and your order will arrive tomorrow by 2 PM. I\'ve also applied a 20% discount to your account for the inconvenience. You\'ll receive a tracking number within the hour. Is there anything else I can help you with today?',
+    message_id: 'MSG-006',
+    turn_number: 6
   },
   {
+    speaker: 'customer',
+    message_text: 'That\'s perfect! Thank you so much for the quick resolution and the discount. Great service!',
     timestamp: '2024-01-27T10:33:30Z',
-    sender: 'customer',
-    message: 'That\'s perfect! Thank you so much for the quick resolution and the discount. Great service!',
-    emotion: 'satisfied'
+    detected_emotion: 'satisfied',
+    confidence: 0.96,
+    message_id: 'MSG-007',
+    turn_number: 7
   }
 ];
 
 const conversationHistory2: ConversationMessage[] = [
   {
+    speaker: 'customer',
+    message_text: 'My account is locked and I can\'t access it',
     timestamp: '2024-01-27T14:20:00Z',
-    sender: 'customer',
-    message: 'My account is locked and I can\'t access it',
-    emotion: 'frustrated'
+    detected_emotion: 'frustrated',
+    confidence: 0.85,
+    message_id: 'MSG-008',
+    turn_number: 1
   },
   {
+    speaker: 'bot',
+    message_text: 'I can help unlock your account. Please verify your email.',
     timestamp: '2024-01-27T14:20:30Z',
-    sender: 'bot',
-    message: 'I can help unlock your account. Please verify your email.',
+    message_id: 'MSG-009',
+    turn_number: 2
   },
   {
+    speaker: 'customer',
+    message_text: 'john.doe@email.com but this isn\'t working',
     timestamp: '2024-01-27T14:21:00Z',
-    sender: 'customer',
-    message: 'john.doe@email.com but this isn\'t working',
-    emotion: 'frustrated'
+    detected_emotion: 'frustrated',
+    confidence: 0.78,
+    message_id: 'MSG-010',
+    turn_number: 3
   },
   {
+    speaker: 'bot',
+    message_text: 'Let me transfer you to a specialist.',
     timestamp: '2024-01-27T14:21:30Z',
-    sender: 'bot',
-    message: 'Let me transfer you to a specialist.',
+    message_id: 'MSG-011',
+    turn_number: 4
   },
 ];
 
@@ -88,6 +116,7 @@ export const mockInteractions: Interaction[] = [
     is_handoff: true,
     handoff_reason: 'complex_issue',
     assigned_agent: 'Sarah Johnson',
+    status: 'completed',
     ticket_status: 'resolved',
     resolved_at: '2024-01-27T10:35:00Z',
     resolution_time_seconds: 300,
@@ -108,26 +137,36 @@ export const mockInteractions: Interaction[] = [
     bot_response: 'I can help you with billing questions. What would you like to know?',
     conversation_history: [
       {
+        speaker: 'customer',
+        message_text: 'I have a question about my last bill',
         timestamp: '2024-01-27T11:15:00Z',
-        sender: 'customer',
-        message: 'I have a question about my last bill',
-        emotion: 'neutral'
+        detected_emotion: 'neutral',
+        confidence: 0.88,
+        message_id: 'MSG-012',
+        turn_number: 1
       },
       {
+        speaker: 'bot',
+        message_text: 'I can help you with billing questions. What would you like to know?',
         timestamp: '2024-01-27T11:15:15Z',
-        sender: 'bot',
-        message: 'I can help you with billing questions. What would you like to know?'
+        message_id: 'MSG-013',
+        turn_number: 2
       },
       {
+        speaker: 'customer',
+        message_text: 'Why was I charged extra this month?',
         timestamp: '2024-01-27T11:15:30Z',
-        sender: 'customer',
-        message: 'Why was I charged extra this month?',
-        emotion: 'neutral'
+        detected_emotion: 'neutral',
+        confidence: 0.92,
+        message_id: 'MSG-014',
+        turn_number: 3
       },
       {
+        speaker: 'bot',
+        message_text: 'I see an additional service charge for premium support. This was added per your request last month.',
         timestamp: '2024-01-27T11:15:45Z',
-        sender: 'bot',
-        message: 'I see an additional service charge for premium support. This was added per your request last month.'
+        message_id: 'MSG-015',
+        turn_number: 4
       }
     ],
     action_taken: 'provided_information',
@@ -135,6 +174,7 @@ export const mockInteractions: Interaction[] = [
     execution_time_ms: 1200,
     is_handoff: false,
     assigned_agent: undefined,
+    status: 'completed',
     ticket_status: 'resolved',
     resolved_at: '2024-01-27T11:18:00Z',
     resolution_time_seconds: 180,
@@ -159,7 +199,8 @@ export const mockInteractions: Interaction[] = [
     is_handoff: true,
     handoff_reason: 'authentication_required',
     assigned_agent: 'Mike Chen',
-    ticket_status: 'in_progress',
+    status: 'in_progress',
+    ticket_status: 'assigned',
     customer_satisfaction: 2,
     feedback_comment: 'Process was too complicated and took too long',
     metadata: { priority: 'high', department: 'technical' }
@@ -192,6 +233,7 @@ export const mockInteractions: Interaction[] = [
     success: true,
     execution_time_ms: 800,
     is_handoff: false,
+    status: 'completed',
     ticket_status: 'resolved',
     resolved_at: '2024-01-27T15:47:00Z',
     resolution_time_seconds: 120,
@@ -199,71 +241,3 @@ export const mockInteractions: Interaction[] = [
     metadata: { priority: 'low', department: 'sales' }
   }
 ];
-
-// Generate dashboard metrics from mock data
-export function calculateDashboardMetrics(interactions: Interaction[]): DashboardMetrics {
-  const total = interactions.length;
-  const successful = interactions.filter(i => i.success).length;
-  const handoffs = interactions.filter(i => i.is_handoff).length;
-  const avgResponseTime = interactions.reduce((sum, i) => sum + i.execution_time_ms, 0) / total;
-  const avgSatisfaction = interactions.reduce((sum, i) => sum + i.customer_satisfaction, 0) / total;
-  
-  const activeIssues = interactions.filter(i => i.ticket_status !== 'resolved' && i.ticket_status !== 'closed');
-  
-  return {
-    totalInteractions: total,
-    successRate: (successful / total) * 100,
-    handoffRate: (handoffs / total) * 100,
-    avgResponseTime: avgResponseTime,
-    customerSatisfaction: avgSatisfaction,
-    activeIssues: {
-      low: activeIssues.filter(i => i.urgency === 'low').length,
-      medium: activeIssues.filter(i => i.urgency === 'medium').length,
-      high: activeIssues.filter(i => i.urgency === 'high').length,
-      critical: activeIssues.filter(i => i.urgency === 'critical').length,
-    }
-  };
-}
-
-// Generate agent performance data
-export function calculateAgentPerformance(interactions: Interaction[]): AgentPerformance[] {
-  const agentMap = new Map<string, Interaction[]>();
-  
-  interactions.forEach(interaction => {
-    if (interaction.assigned_agent) {
-      if (!agentMap.has(interaction.assigned_agent)) {
-        agentMap.set(interaction.assigned_agent, []);
-      }
-      agentMap.get(interaction.assigned_agent)!.push(interaction);
-    }
-  });
-  
-  return Array.from(agentMap.entries()).map(([agent_name, agentInteractions]) => {
-    const total = agentInteractions.length;
-    const resolved = agentInteractions.filter(i => i.success).length;
-    const avgResolutionTime = agentInteractions
-      .filter(i => i.resolution_time_seconds)
-      .reduce((sum, i) => sum + (i.resolution_time_seconds || 0), 0) / total;
-    const avgSatisfaction = agentInteractions.reduce((sum, i) => sum + i.customer_satisfaction, 0) / total;
-    
-    const handoffReasons = agentInteractions
-      .filter(i => i.is_handoff && i.handoff_reason)
-      .reduce((acc, i) => {
-        const reason = i.handoff_reason!;
-        acc[reason] = (acc[reason] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-    
-    return {
-      agent_name,
-      interactions_handled: total,
-      resolution_rate: (resolved / total) * 100,
-      avg_resolution_time: avgResolutionTime,
-      customer_satisfaction: avgSatisfaction,
-      top_handoff_reasons: Object.entries(handoffReasons)
-        .map(([reason, count]) => ({ reason, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 3)
-    };
-  });
-}
