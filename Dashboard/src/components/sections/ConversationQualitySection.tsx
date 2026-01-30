@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Interaction } from '../../types/dashboard';
+import type { Interaction, ConversationMessage } from '../../types/dashboard';
 import { MessageSquare, User, Bot, Search } from 'lucide-react';
 
 interface ConversationQualitySectionProps {
@@ -13,16 +13,16 @@ const ConversationQualitySection: React.FC<ConversationQualitySectionProps> = ({
 
   // Calculate conversation quality score
   const calculateQualityScore = (interaction: Interaction): number => {
-    let score = interaction.customer_satisfaction * 20; // 20-100 base on satisfaction
+    let score = (interaction.customer_satisfaction || 0) * 20; // 20-100 base on satisfaction
     if (interaction.success) score += 10;
-    if (interaction.execution_time_ms < 2000) score += 10;
+    if (interaction.execution_time_ms && interaction.execution_time_ms < 2000) score += 10;
     if (interaction.is_handoff) score -= 10;
     
     // Emotion progression bonus
     const history = interaction.conversation_history;
-    if (history.length > 2) {
-      const firstEmotion = history[0]?.emotion;
-      const lastEmotion = history[history.length - 1]?.emotion;
+    if (Array.isArray(history) && history.length > 2) {
+      const firstEmotion = history[0]?.detected_emotion;
+      const lastEmotion = history[history.length - 1]?.detected_emotion;
       if (firstEmotion === 'frustrated' && (lastEmotion === 'satisfied' || lastEmotion === 'positive')) {
         score += 15; // Successful de-escalation
       }
@@ -43,6 +43,7 @@ const ConversationQualitySection: React.FC<ConversationQualitySectionProps> = ({
       case 'satisfied': return 'text-positive';
       case 'neutral': return 'text-ink-500';
       case 'frustrated': return 'text-negative';
+      case 'stressed': return 'text-negative';
       case 'negative': return 'text-negative';
       default: return 'text-ink-500';
     }
@@ -55,8 +56,8 @@ const ConversationQualitySection: React.FC<ConversationQualitySectionProps> = ({
       (filterByQuality === 'poor' && qualityScore < 50);
     
     const matchesSearch = searchTerm === '' || 
-      interaction.customer_message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      interaction.assigned_agent?.toLowerCase().includes(searchTerm.toLowerCase());
+      (interaction.customer_message && interaction.customer_message.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (interaction.assigned_agent && interaction.assigned_agent.toLowerCase().includes(searchTerm.toLowerCase()));
     
     return matchesFilter && matchesSearch;
   });
@@ -152,7 +153,7 @@ const ConversationQualitySection: React.FC<ConversationQualitySectionProps> = ({
                       {interaction.assigned_agent || 'Bot Only'} · {interaction.channel}
                     </p>
                     <p className="text-caption text-ink-400 truncate">
-                      {interaction.customer_message.substring(0, 80)}...
+                      {interaction.customer_message ? interaction.customer_message.substring(0, 80) + '...' : 'No message'}
                     </p>
                   </button>
                 );
@@ -202,9 +203,9 @@ const ConversationQualitySection: React.FC<ConversationQualitySectionProps> = ({
               {/* Conversation Thread - The Emotional Anchor */}
               <div className="p-5">
                 <div className="space-y-5 max-h-[420px] overflow-y-auto">
-                  {selectedConversation.conversation_history.map((message, index) => {
-                    const isCustomer = message.sender === 'customer';
-                    const isBot = message.sender === 'bot';
+                  {Array.isArray(selectedConversation.conversation_history) && selectedConversation.conversation_history.map((message: ConversationMessage, index: number) => {
+                    const isCustomer = message.speaker === 'customer';
+                    const isBot = message.speaker === 'bot' || message.speaker === 'agent';
                     
                     return (
                       <div key={index} className={`flex gap-3 ${isCustomer ? 'flex-row-reverse' : ''}`}>
@@ -226,11 +227,11 @@ const ConversationQualitySection: React.FC<ConversationQualitySectionProps> = ({
                         <div className={`flex-1 max-w-[75%] ${isCustomer ? 'text-right' : ''}`}>
                           <div className={`flex items-center gap-2 mb-1 ${isCustomer ? 'justify-end' : ''}`}>
                             <span className="text-caption font-medium text-ink-700">
-                              {message.sender === 'customer' ? 'Customer' : message.sender === 'bot' ? 'Bot' : 'Agent'}
+                              {message.speaker === 'customer' ? 'Customer' : message.speaker === 'bot' ? 'Bot' : 'Agent'}
                             </span>
-                            {message.emotion && (
-                              <span className={`text-caption ${getEmotionColor(message.emotion)}`}>
-                                {message.emotion}
+                            {message.detected_emotion && (
+                              <span className={`text-caption ${getEmotionColor(message.detected_emotion)}`}>
+                                {message.detected_emotion}
                               </span>
                             )}
                           </div>
@@ -239,10 +240,16 @@ const ConversationQualitySection: React.FC<ConversationQualitySectionProps> = ({
                               ? 'bg-ink-100 text-ink-900' 
                               : 'bg-ink-50 text-ink-800 border border-ink-200'
                           }`}>
-                            <p className="text-body leading-relaxed">{message.message}</p>
+                            <p className="text-body leading-relaxed">{message.message_text || 'No message'}</p>
                           </div>
                           <p className="text-caption text-ink-400 mt-1">
-                            {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {(() => {
+                              try {
+                                return message.timestamp ? new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+                              } catch {
+                                return 'Invalid time';
+                              }
+                            })()}
                           </p>
                         </div>
                       </div>
@@ -284,7 +291,7 @@ const ConversationQualitySection: React.FC<ConversationQualitySectionProps> = ({
             </div>
           ) : (
             <div className="bg-white border border-ink-200 rounded-lg p-12 text-center">
-              <MessageSquare className="mx-auto text-ink-300 mb-4\" size={40} />
+              <MessageSquare className="mx-auto text-ink-300 mb-4" size={40} />
               <h3 className="text-title text-ink-700 mb-2">Select a Conversation</h3>
               <p className="text-body text-ink-500">Choose a conversation from the list to view details</p>
             </div>

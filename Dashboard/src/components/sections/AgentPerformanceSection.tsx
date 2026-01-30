@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { AgentPerformance } from '../../types/dashboard';
 import Chart from '../Chart';
-import { User, CheckCircle, Star, TrendingUp } from 'lucide-react';
+import { User, CheckCircle, TrendingUp, ThumbsUp, MessageSquare } from 'lucide-react';
 
 interface AgentPerformanceSectionProps {
   agentData: AgentPerformance[];
@@ -9,178 +9,210 @@ interface AgentPerformanceSectionProps {
 
 const AgentPerformanceSection: React.FC<AgentPerformanceSectionProps> = ({ agentData }) => {
   const formatTime = (seconds: number): string => {
-    if (seconds < 60) return `${seconds}s`;
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+    if (!Number.isFinite(seconds) || seconds <= 0) return '—';
+    if (seconds < 60) return `${Math.round(seconds)}s`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${Math.round(seconds % 60)}s`;
     return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
   };
 
   const getPerformanceColor = (rate: number): string => {
-    if (rate >= 90) return 'text-emerald-600';
-    if (rate >= 75) return 'text-amber-600';
-    return 'text-red-600';
+    if (rate >= 90) return 'text-emerald-700';
+    if (rate >= 75) return 'text-amber-700';
+    return 'text-rose-700';
   };
 
-  const getPerformanceBadge = (rate: number): { label: string; color: string } => {
-    if (rate >= 90) return { label: 'Excellent', color: 'bg-gradient-to-r from-emerald-400 to-emerald-600 text-white' };
-    if (rate >= 75) return { label: 'Good', color: 'bg-gradient-to-r from-amber-400 to-amber-600 text-white' };
-    return { label: 'Needs Improvement', color: 'bg-gradient-to-r from-red-400 to-red-600 text-white' };
+  const getBadge = (rate: number): { label: string; classes: string } => {
+    if (rate >= 90) return { label: 'Excellent', classes: 'bg-emerald-50 text-emerald-700 border border-emerald-100' };
+    if (rate >= 75) return { label: 'Good', classes: 'bg-amber-50 text-amber-800 border border-amber-100' };
+    return { label: 'Needs Attention', classes: 'bg-rose-50 text-rose-700 border border-rose-100' };
   };
 
-  // Chart data
-  const performanceComparisonData = {
-    labels: agentData.map(agent => agent.agent_name.split(' ')[0]),
-    datasets: [
-      {
-        label: 'Resolution Rate (%)',
-        data: agentData.map(agent => agent.resolution_rate),
-        backgroundColor: [
-          '#ec4899',
-          '#8b5cf6', 
-          '#6366f1',
-          '#14b8a6',
-          '#f97316',
-        ],
-        borderRadius: 8,
-        borderSkipped: false,
-      },
-    ],
-  };
+  const chartLabels = useMemo(
+    () => agentData.map(a => a.agent_name.split(' ')[0]),
+    [agentData]
+  );
 
-  const satisfactionData = {
-    labels: agentData.map(agent => agent.agent_name.split(' ')[0]),
-    datasets: [
-      {
-        label: 'Customer Satisfaction',
-        data: agentData.map(agent => agent.customer_satisfaction),
-        borderColor: '#8b5cf6',
-        backgroundColor: 'rgba(139, 92, 246, 0.1)',
-        borderWidth: 3,
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: agentData.map((_, index) => 
-          ['#ec4899', '#8b5cf6', '#6366f1', '#14b8a6', '#f97316'][index % 5]
-        ),
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointRadius: 8,
-      },
-    ],
-  };
+  const resolutionRateData = useMemo(
+    () => ({
+      labels: chartLabels,
+      datasets: [
+        {
+          label: 'Resolution Rate (%)',
+          data: agentData.map(a => a.resolution_rate ?? 0),
+          backgroundColor: '#e4e4e7',
+          hoverBackgroundColor: '#0d9488',
+          borderRadius: 6,
+          borderSkipped: false,
+        },
+      ],
+    }),
+    [agentData, chartLabels]
+  );
+
+  // satisfaction_score based metric
+  const satisfactionByAgentData = useMemo(
+    () => ({
+      labels: chartLabels,
+      datasets: [
+        {
+          label: 'Satisfied (%)',
+          data: agentData.map(a => a.satisfied_rate_pct ?? 0),
+          backgroundColor: '#e2e8f0',
+          hoverBackgroundColor: '#334155',
+          borderRadius: 6,
+          borderSkipped: false,
+        },
+      ],
+    }),
+    [agentData, chartLabels]
+  );
+
+  const topSummary = useMemo(() => {
+    if (!agentData.length) return null;
+    const best = [...agentData].sort((a, b) => (b.resolution_rate ?? 0) - (a.resolution_rate ?? 0))[0];
+    return best ?? null;
+  }, [agentData]);
 
   return (
-    <div className="p-8 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="px-8 py-6 bg-ink-50 min-h-screen">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-          Agent Performance
-        </h1>
-        <p className="text-gray-600">Individual agent metrics and performance insights</p>
+        <h1 className="text-display text-ink-900">Agent Performance</h1>
+        <p className="text-body text-ink-500 mt-1">
+          Resolution rate + satisfaction_score feedback (Yes/No)
+        </p>
       </div>
 
-      {/* Performance Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <div className="bg-white rounded-xl p-6 shadow-xl border border-gray-100">
+      {/* Quick highlight */}
+      {topSummary && (
+        <div className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-label uppercase text-ink-500 tracking-wide">Top Performer</p>
+              <div className="mt-1 text-xl font-semibold text-ink-900">{topSummary.agent_name}</div>
+              <p className="text-caption text-ink-500 mt-1">
+                Resolution: {topSummary.resolution_rate.toFixed(1)}% · Satisfied: {(topSummary.satisfied_rate_pct ?? 0).toFixed(1)}%
+              </p>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-ink-900 flex items-center justify-center">
+              <CheckCircle className="text-white" size={20} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+        <div className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
           <div className="flex items-center mb-4">
-            <TrendingUp className="text-purple-500 mr-3" size={24} />
-            <h3 className="text-xl font-bold text-gray-900">Resolution Rate Comparison</h3>
+            <TrendingUp className="text-ink-700 mr-2" size={18} />
+            <h3 className="text-title text-ink-900">Resolution Rate</h3>
           </div>
           <Chart
             type="bar"
-            data={performanceComparisonData}
+            data={resolutionRateData}
+            className="h-64"
+            options={{
+              scales: {
+                y: { beginAtZero: true, max: 100 },
+              },
+              plugins: {
+                legend: { position: 'bottom' },
+              },
+            }}
+          />
+        </div>
+
+        <div className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
+          <div className="flex items-center mb-4">
+            <ThumbsUp className="text-ink-700 mr-2" size={18} />
+            <h3 className="text-title text-ink-900">Satisfied Rate (satisfaction_score)</h3>
+          </div>
+          <Chart
+            type="bar"
+            data={satisfactionByAgentData}
             className="h-64"
             options={{
               scales: {
                 y: {
                   beginAtZero: true,
                   max: 100,
+                  ticks: { callback: (v: any) => `${v}%` },
                 },
               },
-            }}
-          />
-        </div>
-
-        <div className="bg-white rounded-xl p-6 shadow-xl border border-gray-100">
-          <div className="flex items-center mb-4">
-            <Star className="text-yellow-500 mr-3" size={24} />
-            <h3 className="text-xl font-bold text-gray-900">Satisfaction Trend</h3>
-          </div>
-          <Chart
-            type="line"
-            data={satisfactionData}
-            className="h-64"
-            options={{
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  max: 5,
-                },
+              plugins: {
+                legend: { position: 'bottom' },
               },
             }}
           />
         </div>
       </div>
 
-      {/* Performance Summary Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-        {agentData.map((agent) => {
-          const badge = getPerformanceBadge(agent.resolution_rate);
-          const colors = ['from-pink-400 to-purple-600', 'from-blue-400 to-indigo-600', 'from-emerald-400 to-teal-600'];
-          const colorIndex = Math.abs(agent.agent_name.charCodeAt(0)) % colors.length;
-          
+      {/* Agent cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
+        {agentData.map(agent => {
+          const badge = getBadge(agent.resolution_rate ?? 0);
+
           return (
-            <div key={agent.agent_name} className="bg-white rounded-xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
+            <div key={agent.agent_name} className="bg-white border border-ink-200 rounded-xl p-5 shadow-sm">
+              <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center">
-                  <div className={`bg-gradient-to-br ${colors[colorIndex]} rounded-full p-3 mr-3 shadow-lg`}>
-                    <User className="text-white" size={20} />
+                  <div className="w-10 h-10 rounded-full bg-ink-900 flex items-center justify-center mr-3">
+                    <User className="text-white" size={18} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">{agent.agent_name}</h3>
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${badge.color} shadow-sm`}>
+                    <h3 className="font-semibold text-ink-900">{agent.agent_name}</h3>
+                    <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${badge.classes}`}>
                       {badge.label}
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">Interactions</span>
-                  <span className="font-bold text-blue-600 text-lg">{agent.interactions_handled}</span>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 bg-ink-50 rounded-lg border border-ink-100">
+                  <span className="text-sm text-ink-600">Interactions</span>
+                  <span className="font-semibold text-ink-900">{agent.interactions_handled}</span>
                 </div>
 
-                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">Resolution Rate</span>
-                  <span className={`font-bold text-lg ${getPerformanceColor(agent.resolution_rate)}`}>
-                    {agent.resolution_rate.toFixed(1)}%
+                <div className="flex justify-between items-center p-3 bg-ink-50 rounded-lg border border-ink-100">
+                  <span className="text-sm text-ink-600">Resolution Rate</span>
+                  <span className={`font-semibold ${getPerformanceColor(agent.resolution_rate ?? 0)}`}>
+                    {(agent.resolution_rate ?? 0).toFixed(1)}%
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-orange-50 to-pink-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">Avg Time</span>
-                  <span className="font-bold text-orange-600 text-lg">
-                    {formatTime(agent.avg_resolution_time)}
+                <div className="flex justify-between items-center p-3 bg-ink-50 rounded-lg border border-ink-100">
+                  <span className="text-sm text-ink-600">Avg Resolution Time</span>
+                  <span className="font-semibold text-ink-900">{formatTime(agent.avg_resolution_time ?? 0)}</span>
+                </div>
+
+                <div className="flex justify-between items-center p-3 bg-ink-50 rounded-lg border border-ink-100">
+                  <span className="text-sm text-ink-600">Satisfied</span>
+                  <span className="font-semibold text-ink-900">
+                    {(agent.satisfied_rate_pct ?? 0).toFixed(1)}%
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">Satisfaction</span>
-                  <div className="flex items-center">
-                    <Star className="text-yellow-400 fill-current mr-1" size={16} />
-                    <span className="font-bold text-yellow-600 text-lg">
-                      {agent.customer_satisfaction.toFixed(1)}
-                    </span>
-                  </div>
+                <div className="flex justify-between items-center p-3 bg-ink-50 rounded-lg border border-ink-100">
+                  <span className="text-sm text-ink-600">Feedback Coverage</span>
+                  <span className="font-semibold text-ink-900">
+                    {(agent.feedback_rate_pct ?? 0).toFixed(1)}%
+                  </span>
                 </div>
 
-                {/* Top Handoff Reasons */}
-                {agent.top_handoff_reasons.length > 0 && (
-                  <div className="pt-3 border-t border-gray-200">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Top Escalation Reasons:</p>
-                    <div className="space-y-1">
-                      {agent.top_handoff_reasons.slice(0, 2).map((reason, idx) => (
-                        <div key={idx} className="flex justify-between items-center p-2 bg-gray-50 rounded text-xs">
-                          <span className="text-gray-600 capitalize">{reason.reason.replace('_', ' ')}</span>
-                          <span className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full font-medium">{reason.count}</span>
+                {agent.top_handoff_reasons?.length > 0 && (
+                  <div className="pt-3 border-t border-ink-200">
+                    <div className="flex items-center mb-2">
+                      <MessageSquare className="text-ink-600 mr-2" size={14} />
+                      <p className="text-sm font-medium text-ink-700">Top Escalation Reasons</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      {agent.top_handoff_reasons.slice(0, 3).map((r, idx) => (
+                        <div key={idx} className="flex justify-between items-center p-2 bg-white rounded border border-ink-200 text-xs">
+                          <span className="text-ink-700 capitalize">{r.reason.replaceAll('_', ' ')}</span>
+                          <span className="bg-ink-100 text-ink-700 px-2 py-0.5 rounded-full font-medium">
+                            {r.count}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -192,115 +224,71 @@ const AgentPerformanceSection: React.FC<AgentPerformanceSectionProps> = ({ agent
         })}
       </div>
 
-      {/* Performance Comparison Table */}
-      <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
-        <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-          <h3 className="text-xl font-bold text-gray-900">Performance Leaderboard</h3>
-          <p className="text-sm text-gray-600">Compare agents across key metrics</p>
+      {/* Leaderboard */}
+      <div className="bg-white border border-ink-200 rounded-xl overflow-hidden shadow-sm">
+        <div className="px-6 py-4 border-b border-ink-200 bg-ink-50">
+          <h3 className="text-title text-ink-900">Leaderboard</h3>
+          <p className="text-caption text-ink-500 mt-1">Sorted by resolution rate</p>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gradient-to-r from-purple-100 to-blue-100">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Agent
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Interactions
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Resolution Rate
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Avg Time
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Satisfaction
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                  Performance
-                </th>
+            <thead className="bg-white">
+              <tr className="border-b border-ink-200">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-ink-600 uppercase tracking-wider">Agent</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-ink-600 uppercase tracking-wider">Interactions</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-ink-600 uppercase tracking-wider">Resolution</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-ink-600 uppercase tracking-wider">Avg Time</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-ink-600 uppercase tracking-wider">Satisfied</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-ink-600 uppercase tracking-wider">Feedback</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {agentData
-                .sort((a, b) => b.resolution_rate - a.resolution_rate)
-                .map((agent, index) => {
-                  const badge = getPerformanceBadge(agent.resolution_rate);
-                  const rowColors = ['bg-gradient-to-r from-pink-50 to-purple-50', 'bg-gradient-to-r from-blue-50 to-indigo-50', 'bg-white'];
-                  
-                  return (
-                    <tr key={agent.agent_name} className={`hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 transition-colors ${index < 3 ? rowColors[index] : 'bg-white'}`}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="bg-gradient-to-br from-blue-400 to-purple-600 rounded-full p-2 mr-3">
-                            <User className="text-white" size={16} />
-                          </div>
-                          <div>
-                            <span className="font-bold text-gray-900">{agent.agent_name}</span>
-                            {index === 0 && (
-                              <div className="flex items-center mt-1">
-                                <span className="inline-block w-3 h-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full mr-1" title="Top Performer"></span>
-                                <span className="text-xs font-medium text-orange-600">Top Performer</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-lg font-bold text-blue-600">
-                          {agent.interactions_handled}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`text-lg font-bold ${getPerformanceColor(agent.resolution_rate)}`}>
-                          {agent.resolution_rate.toFixed(1)}%
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-lg font-medium text-gray-900">
-                        {formatTime(agent.avg_resolution_time)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <Star className="text-yellow-400 fill-current mr-1" size={16} />
-                          <span className="text-lg font-bold text-yellow-600">{agent.customer_satisfaction.toFixed(1)}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${badge.color}`}>
-                          {badge.label}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
+
+            <tbody className="divide-y divide-ink-100">
+              {[...agentData]
+                .sort((a, b) => (b.resolution_rate ?? 0) - (a.resolution_rate ?? 0))
+                .map((agent) => (
+                  <tr key={agent.agent_name} className="hover:bg-ink-50">
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-ink-900">{agent.agent_name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-ink-600">{agent.interactions_handled}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`font-medium ${getPerformanceColor(agent.resolution_rate ?? 0)}`}>
+                        {(agent.resolution_rate ?? 0).toFixed(1)}%
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-ink-600">{formatTime(agent.avg_resolution_time ?? 0)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-ink-600">{(agent.satisfied_rate_pct ?? 0).toFixed(1)}%</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-ink-600">{(agent.feedback_rate_pct ?? 0).toFixed(1)}%</td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Coaching Opportunities */}
-      <div className="mt-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-8 text-white shadow-xl">
-        <div className="flex items-center mb-6">
-          <CheckCircle className="text-white mr-3" size={28} />
-          <h3 className="text-2xl font-bold">Coaching Opportunities</h3>
+      {/* Coaching (keep it but make it subtle) */}
+      <div className="mt-8 bg-white border border-ink-200 rounded-xl p-6 shadow-sm">
+        <div className="flex items-center mb-4">
+          <CheckCircle className="text-ink-700 mr-2" size={18} />
+          <h3 className="text-title text-ink-900">Coaching Opportunities</h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white/20 backdrop-blur rounded-xl p-6 border border-white/30">
-            <h4 className="font-bold text-xl text-white mb-4">Focus Areas</h4>
-            <ul className="text-white/90 space-y-2">
-              <li className="flex items-center"><span className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></span>Complex issue resolution techniques</li>
-              <li className="flex items-center"><span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>Authentication process optimization</li>
-              <li className="flex items-center"><span className="w-2 h-2 bg-pink-400 rounded-full mr-2"></span>Customer de-escalation strategies</li>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 bg-ink-50 rounded-lg border border-ink-100">
+            <h4 className="text-sm font-medium text-ink-900 mb-2">Focus Areas</h4>
+            <ul className="text-sm text-ink-600 space-y-1.5">
+              <li>Complex issue resolution techniques</li>
+              <li>Authentication flow improvements</li>
+              <li>De-escalation in first 2 turns</li>
             </ul>
           </div>
-          <div className="bg-white/20 backdrop-blur rounded-xl p-6 border border-white/30">
-            <h4 className="font-bold text-xl text-white mb-4">Best Practices</h4>
-            <ul className="text-white/90 space-y-2">
-              <li className="flex items-center"><span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>Quick acknowledgment of concerns</li>
-              <li className="flex items-center"><span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>Clear explanation of next steps</li>
-              <li className="flex items-center"><span className="w-2 h-2 bg-orange-400 rounded-full mr-2"></span>Follow-up for complex issues</li>
+
+          <div className="p-4 bg-ink-50 rounded-lg border border-ink-100">
+            <h4 className="text-sm font-medium text-ink-900 mb-2">Best Practices</h4>
+            <ul className="text-sm text-ink-600 space-y-1.5">
+              <li>Quick acknowledgment of concerns</li>
+              <li>Clear next steps + time estimates</li>
+              <li>Confirm resolution before closing</li>
             </ul>
           </div>
         </div>
