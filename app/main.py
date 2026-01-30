@@ -37,6 +37,8 @@ CONFIG = {
         "c'est tout", "c est tout", "merci c'est tout", "merci c est tout", 
         "merci bonne journée", "merci à bientôt", "ça suffit", "stop", "arrêt"
     ],
+    "collect_feedback": True,     # 🆕 Collecter le feedback client
+    "feedback_timeout": 10,       # 🆕 Timeout en secondes pour le feedback
 }
 
 
@@ -69,13 +71,125 @@ def print_section(title: str, emoji: str = "📋"):
     print(f"\n{emoji} {title}")
     print("─" * 60)
 
+# FeedBack 
+def collect_feedback(
+    interaction_id: str,
+    session_id: str,
+    last_action: str = None
+) -> Optional[int]:
+    """
+    Collecte le feedback du client à la fin de l'appel.
+    
+    Args:
+        interaction_id: ID de l'interaction dans la base de données
+        session_id: ID de la session
+        last_action: Dernière action effectuée (pour ne pas demander si handoff)
+        
+    Returns:
+        satisfaction_score: 1 (Satisfait) ou 2 (Insatisfait) ou None
+    """
+    # Ne pas demander de feedback si transfert vers humain
+    if last_action == "human_handoff":
+        print("\n📊 Feedback non collecté (transfert vers agent humain)")
+        return None
+    
+    print("\n" + "="*70)
+    print("📊 FEEDBACK CLIENT")
+    print("="*70)
+    print("💬 Notre service vous a-t-il été utile ?")
+    print("")
+    print("   1️⃣  Appuyez sur la touche [1] pour OUI (Satisfait)")
+    print("   2️⃣  Appuyez sur la touche [2] pour NON (Insatisfait)")
+    print("")
+    print(f"⏳ En attente de votre réponse (timeout: {CONFIG['feedback_timeout']}s)...")
+    print("="*70)
+    
+    satisfaction_score = None
+    start_time = time.time()
+    
+    # Méthode 1: Essayer avec la bibliothèque keyboard (si disponible)
+    try:
+        import keyboard
+        timeout = CONFIG['feedback_timeout']
+        
+        while time.time() - start_time < timeout:
+            if keyboard.is_pressed('1'):
+                satisfaction_score = 1
+                time.sleep(0.3)  # Éviter les doubles pressions
+                break
+            elif keyboard.is_pressed('2'):
+                satisfaction_score = 2
+                time.sleep(0.3)
+                break
+            time.sleep(0.1)
+        
+        if satisfaction_score is None:
+            print("\n   ⏱️  Pas de réponse reçue (timeout)")
+    
+    except ImportError:
+        # Méthode 2: Fallback avec input() standard
+        print("\n💡 Entrez votre réponse et appuyez sur Entrée:")
+        try:
+            import select
+            import sys
+            
+            # Timeout pour Windows (pas de select sur stdin)
+            response = input("   (1 = Oui, 2 = Non): ").strip()
+            
+            if response == '1':
+                satisfaction_score = 1
+            elif response == '2':
+                satisfaction_score = 2
+            else:
+                print("   ⚠️ Réponse non reconnue")
+        except Exception as e:
+            print(f"   ⚠️ Erreur lors de la collecte: {e}")
+    
+    # Afficher la réponse
+    if satisfaction_score == 1:
+        print("\n   ✅ Merci ! Vous avez répondu OUI (Satisfait)")
+        print("   🙏 Nous sommes ravis d'avoir pu vous aider !")
+    elif satisfaction_score == 2:
+        print("\n   ❌ Merci pour votre retour (Insatisfait)")
+        print("   📝 Nous allons améliorer notre service.")
+    
+    # Enregistrer dans PostgreSQL
+    if satisfaction_score and interaction_id:
+        try:
+            response_time = time.time() - start_time
+            success = db_service.update_satisfaction_score(
+                interaction_id=interaction_id,
+                satisfaction_score=satisfaction_score,
+                feedback_metadata={
+                    "method": "keyboard",
+                    "response_time_seconds": round(response_time, 2),
+                    "session_id": session_id,
+                    "collected_at": time.strftime("%Y-%m-%d %H:%M:%S")
+                }
+            )
+            
+            if success:
+                # Afficher les statistiques en temps réel
+                print("\n" + "-"*50)
+                stats = db_service.get_satisfaction_statistics(days=7)
+                print(f"📈 Statistiques (7 derniers jours):")
+                print(f"   • Taux de satisfaction: {stats['satisfaction_rate']:.1f}%")
+                print(f"   • Feedbacks collectés: {stats['feedbacks_collected']}/{stats['total_interactions']} ({stats['feedback_rate']:.1f}%)")
+                print(f"   • ✅ Satisfaits: {stats['satisfied']} | ❌ Insatisfaits: {stats['unsatisfied']}")
+                print("-"*50)
+        
+        except Exception as e:
+            print(f"   ⚠️ Erreur enregistrement feedback: {e}")
+    
+    return satisfaction_score
 
 def process_single_turn(
     orchestrator,
     conversation_history: list,
     turn_number: int = 1,
     session_id: str = None,
-    interaction_id: str = None
+    interaction_id: str = None,
+    inputs_service = None
 ) -> Dict[str, Any]:
     """
     Process a single conversation turn.
@@ -378,18 +492,20 @@ def process_single_turn(
         conversation_state["has_said_goodbye"] = True
         conversation_state["goodbye_count"] += 1
         
-        # Create a simple goodbye response instead of processing through the full pipeline
+        # Create a goodbye response with integrated satisfaction question
+        goodbye_with_feedback = "Merci pour votre appel. Comment avez-vous trouvé notre service aujourd'hui ? Êtes-vous satisfait ?"
+        
         response = type('Response', (), {
-            'response_text': "Merci pour votre appel. CNP Assurances vous remercie. Au revoir et à bientôt !",
-            'action': "end_call",
+            'response_text': goodbye_with_feedback,
+            'action': "end_call_with_feedback",
             'confidence': 1.0,
-            'next_step': "end_call",
+            'next_step': "collect_feedback",
             'documents_used': [],
             'audio_base64': None,
-            'metadata': {"is_goodbye": True}
+            'metadata': {"is_goodbye": True, "collect_feedback": True}
         })()
         
-        # Generate TTS for goodbye message if enabled
+        # Generate TTS for goodbye message with feedback question if enabled
         if CONFIG["enable_tts"]:
             try:
                 audio_result = orchestrator.tts.generate_speech(
@@ -397,11 +513,11 @@ def process_single_turn(
                     emotion="neutral"
                 )
                 response.audio_base64 = audio_result.get("audio_base64", "")
-                print(f"   ✅ TTS généré pour au revoir en {audio_result.get('generation_time', 0):.2f}s")
+                print(f"   ✅ TTS généré pour au revoir + feedback en {audio_result.get('generation_time', 0):.2f}s")
             except Exception as e:
                 print(f"   ⚠️  Erreur TTS au revoir: {e}")
         
-        print("   🛑 Conversation marquée comme terminée")
+        print("   🛑 Conversation marquée comme terminée avec collecte feedback")
     else:
         # Standard response generation
         response = callbot_global_response(
@@ -497,6 +613,166 @@ def process_single_turn(
     if conversation_state["has_said_goodbye"] or should_say_goodbye:
         should_continue = False
         print("   🛑 Conversation forcée à s'arrêter (goodbye détecté)")
+        
+        # Si c'est un goodbye avec feedback, capturer la réponse
+        if response.action == "end_call_with_feedback":
+            print("\n🎤 En attente de votre réponse à la question de satisfaction...")
+            print("⏰ Vous avez 20 secondes pour répondre...")
+            try:
+                # Utiliser inputs_service passé en paramètre ou le récupérer
+                if inputs_service is None:
+                    print("🔧 Initialisation des services d'entrée...")
+                    inputs_service = get_inputs_service()
+                
+                # Capturer l'audio de réponse avec timeout plus long
+                import threading
+                import time as time_module
+                
+                feedback_result = None
+                capture_successful = False
+                capture_error = None
+                
+                # Fonction pour capturer l'audio avec timeout
+                def capture_feedback():
+                    nonlocal feedback_result, capture_successful, capture_error
+                    try:
+                        print("🎙️  Début de l'écoute pour feedback...")
+                        feedback_result = inputs_service.process_audio_input()
+                        capture_successful = True
+                        print("✅ Audio capturé avec succès")
+                    except Exception as e:
+                        capture_error = str(e)
+                        print(f"❌ Erreur capture: {e}")
+                
+                # Lancer la capture en thread
+                capture_thread = threading.Thread(target=capture_feedback, daemon=True)
+                capture_thread.start()
+                
+                # Attendre avec timeout de 20 secondes
+                timeout_seconds = 20
+                start_wait = time_module.time()
+                
+                while not capture_successful and (time_module.time() - start_wait) < timeout_seconds:
+                    remaining = timeout_seconds - int(time_module.time() - start_wait)
+                    if remaining > 0:
+                        print(f"⏰ Temps restant: {remaining}s", end="\r")
+                    time_module.sleep(1)
+                
+                print()  # Nouvelle ligne après le compteur
+                
+                if capture_error:
+                    print(f"❌ Erreur technique: {capture_error}")
+                
+                if feedback_result:
+                    print(f"📊 Résultat feedback: {feedback_result}")
+                    print(f"🔍 Type: {type(feedback_result)}")
+                    print(f"🔍 Clés disponibles: {list(feedback_result.keys()) if isinstance(feedback_result, dict) else 'N/A'}")
+                    
+                    # Vérifier les différentes clés possibles
+                    feedback_text = ""
+                    if 'full_text' in feedback_result:  # 🔧 CORRECTION: clé principale
+                        feedback_text = feedback_result['full_text']
+                        print(f"🎯 Texte trouvé via 'full_text': {feedback_text}")
+                    elif 'transcription' in feedback_result:
+                        feedback_text = feedback_result['transcription']
+                        print(f"🎯 Texte trouvé via 'transcription': {feedback_text}")
+                    elif 'text' in feedback_result:
+                        feedback_text = feedback_result['text']
+                        print(f"🎯 Texte trouvé via 'text': {feedback_text}")
+                    else:
+                        print("❌ Aucune clé de texte trouvée dans le résultat")
+                    
+                    if feedback_text:
+                        feedback_text = feedback_text.strip().lower()
+                        print(f"🗣️  Réponse feedback: '{feedback_text}'")
+                        
+                        # Analyser la réponse pour déterminer satisfaction
+                        satisfaction_score = None
+                        if any(word in feedback_text for word in ['oui', 'satisfait', 'content', 'bien', 'parfait', 'excellent', 'très bien', 'top', 'super']):
+                            satisfaction_score = 1
+                            confirmation = "Merci pour votre retour positif !"
+                        elif any(word in feedback_text for word in ['non', 'insatisfait', 'mécontent', 'pas bien', 'mal', 'mauvais', 'nul', 'décevant']):
+                            satisfaction_score = 2
+                            confirmation = "Merci pour votre retour. Nous allons améliorer notre service."
+                        else:
+                            # Pas de mot clé clair - pas d'enregistrement
+                            confirmation = "Merci pour votre appel."
+                            print(f"⚠️ Réponse ambiguë: '{feedback_text}' - pas d'enregistrement")
+                        
+                        # Enregistrer le feedback SEULEMENT si on a une réponse claire
+                        if satisfaction_score and interaction_id:
+                            try:
+                                print(f"💾 Tentative d'enregistrement: interaction_id={interaction_id}, score={satisfaction_score}")
+                                success = db_service.update_satisfaction_score(
+                                    interaction_id=interaction_id,
+                                    satisfaction_score=satisfaction_score,
+                                    feedback_metadata={
+                                        "method": "integrated_audio",
+                                        "raw_response": feedback_text,
+                                        "session_id": session_id,
+                                        "collected_at": time.strftime("%Y-%m-%d %H:%M:%S")
+                                    }
+                                )
+                                if success:
+                                    score_label = "✅ SATISFAIT" if satisfaction_score == 1 else "❌ INSATISFAIT"
+                                    print(f"💾 {score_label} - Feedback enregistré avec succès dans la DB")
+                                else:
+                                    print("❌ Échec de l'enregistrement en base de données")
+                            except Exception as e:
+                                print(f"❌ ERREUR enregistrement feedback: {e}")
+                                import traceback
+                                traceback.print_exc()
+                        
+                        # Jouer la confirmation finale ET le "Merci"
+                        final_message = confirmation + " Merci."
+                        
+                        if CONFIG["enable_tts"]:
+                            try:
+                                print(f"🔊 Génération TTS pour: '{final_message}'")
+                                final_response = orchestrator.tts.generate_speech(
+                                    text=final_message,
+                                    emotion="neutral"
+                                )
+                                if final_response.get("audio_base64"):
+                                    final_audio = type('Response', (), {
+                                        'audio_base64': final_response["audio_base64"]
+                                    })()
+                                    play_audio_response(final_audio, blocking=True)
+                                    print("🔊 Message final joué avec succès")
+                                else:
+                                    print("⚠️ Pas d'audio généré")
+                            except Exception as e:
+                                print(f"❌ Erreur TTS final: {e}")
+                        
+                        print(f"\n💬 {final_message}")
+                    else:
+                        print("⚠️ Pas de texte trouvé dans la réponse audio")
+                        print(f"📊 Structure complète: {feedback_result}")
+                else:
+                    print("⚠️ Pas de réponse audio détectée pour le feedback")
+                    # Message par défaut si pas de réponse
+                    default_msg = "Merci pour votre appel."
+                    print(f"\n💬 {default_msg}")
+                    
+                    if CONFIG["enable_tts"]:
+                        try:
+                            default_response = orchestrator.tts.generate_speech(
+                                text=default_msg,
+                                emotion="neutral"
+                            )
+                            if default_response.get("audio_base64"):
+                                default_audio = type('Response', (), {
+                                    'audio_base64': default_response["audio_base64"]
+                                })()
+                                play_audio_response(default_audio, blocking=True)
+                                print("🔊 Message par défaut joué")
+                        except Exception as e:
+                            print(f"⚠️ Erreur TTS défaut: {e}")
+                    
+            except Exception as e:
+                print(f"❌ ERREUR CRITIQUE feedback audio: {e}")
+                import traceback
+                traceback.print_exc()
     
     # =========================================================================
     # STEP 5: GESTION DU HANDOFF (si nécessaire)
@@ -599,7 +875,8 @@ def run_conversation():
                 conversation_history=conversation_history,
                 turn_number=turn_number,
                 session_id=session_id,
-                interaction_id=interaction_id
+                interaction_id=interaction_id,
+                inputs_service=inputs_service
             )
             
             # 🆕 Récupérer l'interaction_id pour les tours suivants
