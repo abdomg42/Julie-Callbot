@@ -250,7 +250,7 @@ class ResponseBuilder:
             
             # Ajouter une indication si la réponse a été raccourcie
             if len(answer) > MAX_VOICE_LENGTH:
-                print(f"   ✂️  Réponse raccourcie: {len(answer)} → {len(main_content)} chars")
+                print(f" -- Réponse raccourcie: {len(answer)} → {len(main_content)} chars")
             
             # Build response (keep it short!)
             response_text = f"{prefix}{main_content}"

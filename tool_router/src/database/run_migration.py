@@ -14,7 +14,7 @@ def run_migration():
     """Exécute la migration SQL"""
     
     # Chemin du fichier de migration
-    migration_file = Path(__file__).parent / "migrations" / "001_add_satisfaction_score.sql"
+    migration_file = Path(__file__).parent / "migrations" / "002_drop_customer_columns.sql"
     
     if not migration_file.exists():
         print(f"❌ Fichier de migration introuvable: {migration_file}")
@@ -34,7 +34,7 @@ def run_migration():
     alt_connection_string = "postgresql://postgres:1598@localhost:5432/callbot_db"
     
     print("\n" + "="*80)
-    print("🔧 EXÉCUTION DE LA MIGRATION: Ajout de satisfaction_score")
+    print("🔧 EXÉCUTION DE LA MIGRATION: Suppression des colonnes customer_name et customer_email")
     print("="*80)
     print(f"📁 Fichier: {migration_file.name}")
     print(f"🗄️  Base: {connection_string.split('@')[1]}")
@@ -56,34 +56,21 @@ def run_migration():
         
         print("✅ Migration exécutée avec succès !")
         
-        # Vérifier que la colonne existe
+        # Vérifier que les colonnes ont été supprimées
         cursor.execute("""
-            SELECT column_name, data_type, is_nullable
+            SELECT column_name
             FROM information_schema.columns
             WHERE table_name = 'callbot_interactions'
-              AND column_name = 'satisfaction_score'
+              AND column_name IN ('customer_name', 'customer_email')
         """)
         
-        result = cursor.fetchone()
-        if result:
-            print(f"\n📊 Colonne créée:")
-            print(f"   Nom: {result[0]}")
-            print(f"   Type: {result[1]}")
-            print(f"   Nullable: {result[2]}")
-        
-        # Lister les vues créées
-        cursor.execute("""
-            SELECT viewname
-            FROM pg_views
-            WHERE viewname LIKE 'v_satisfaction%'
-            ORDER BY viewname
-        """)
-        
-        views = cursor.fetchall()
-        if views:
-            print(f"\n📈 Vues créées ({len(views)}):")
-            for view in views:
-                print(f"   • {view[0]}")
+        result = cursor.fetchall()
+        if not result:
+            print(f"\n📊 Colonnes supprimées avec succès:")
+            print(f"   • customer_name")
+            print(f"   • customer_email")
+        else:
+            print(f"\n⚠️  Certaines colonnes existent encore: {[r[0] for r in result]}")
         
         cursor.close()
         conn.close()

@@ -36,7 +36,7 @@ class DatabaseService:
     def __init__(self):
         # En développement: utiliser des fichiers JSON comme "base de données"
         # En production: utiliser PostgreSQL
-        self.use_mock = os.getenv("USE_MOCK_DB", "true").lower() == "true"
+        self.use_mock = os.getenv("USE_MOCK_DB", "false").lower() == "true"
         self.connection_string = os.getenv(
             "DATABASE_URL",
             "postgresql://postgres:1598@localhost:5432/callbot_db"
@@ -100,6 +100,7 @@ class DatabaseService:
         action_taken: str,
         priority: str,
         reason: str,
+        customer_phone: str = None,
         metadata: Dict = None
     ) -> str:
         """
@@ -113,6 +114,7 @@ class DatabaseService:
         interaction = {
             "interaction_id": interaction_id,
             "customer_id": customer_id,
+            "customer_phone": customer_phone,
             "session_id": session_id,
             "intent": intent,
             "urgency": urgency,
@@ -142,12 +144,12 @@ class DatabaseService:
             try:
                 cursor.execute("""
                     INSERT INTO callbot_interactions (
-                        interaction_id, customer_id, session_id,
+                        interaction_id, customer_id, customer_phone, session_id,
                         intent, urgency, emotion, confidence,
                         action_taken, priority, status, metadata
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
-                    interaction_id, customer_id, session_id,
+                    interaction_id, customer_id, customer_phone, session_id,
                     intent, urgency, emotion, confidence,
                     action_taken, priority, "pending",
                     Json(metadata or {})
@@ -329,6 +331,66 @@ class DatabaseService:
                 if row and row['conversation_history']:
                     return row['conversation_history']
                 return []
+            finally:
+                cursor.close()
+                conn.close()
+    
+    def update_interaction_conversation(
+        self,
+        interaction_id: str,
+        customer_message: str,
+        bot_response: str,
+        conversation_history: List[Dict],
+        execution_time_ms: int,
+        action_result: str,
+        success: bool
+    ) -> bool:
+        """Met à jour une interaction avec les données de conversation"""
+        
+        if self.use_mock:
+            interactions = self._load_json(self.interactions_file)
+            for interaction in interactions:
+                if interaction["interaction_id"] == interaction_id:
+                    interaction["customer_message"] = customer_message
+                    interaction["bot_response"] = bot_response
+                    interaction["conversation_history"] = conversation_history
+                    interaction["execution_time_ms"] = execution_time_ms
+                    interaction["action_result"] = action_result
+                    interaction["success"] = success
+                    interaction["updated_at"] = datetime.now().isoformat()
+                    break
+            self._save_json(self.interactions_file, interactions)
+            return True
+        else:
+            # Mode PostgreSQL - Mettre à jour l'interaction
+            conn = self._get_connection()
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute("""
+                    UPDATE callbot_interactions
+                    SET customer_message = %s,
+                        bot_response = %s,
+                        conversation_history = %s,
+                        execution_time_ms = %s,
+                        action_result = %s,
+                        success = %s,
+                        updated_at = NOW()
+                    WHERE interaction_id = %s
+                    RETURNING interaction_id
+                """, (
+                    customer_message,
+                    bot_response,
+                    Json(conversation_history),
+                    execution_time_ms,
+                    action_result,
+                    success,
+                    interaction_id
+                ))
+                
+                conn.commit()
+                result = cursor.fetchone()
+                return result is not None
             finally:
                 cursor.close()
                 conn.close()

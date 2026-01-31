@@ -4,8 +4,6 @@ export interface Interaction {
   created_at: string;
   updated_at?: string;
   customer_id?: string;
-  customer_name?: string;
-  customer_email?: string;
   customer_phone?: string;
   session_id: string;
   channel: 'chat' | 'phone' | 'email' | 'sms';

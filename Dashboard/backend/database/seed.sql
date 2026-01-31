@@ -83,8 +83,6 @@ CREATE TABLE public.callbot_interactions (
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     customer_id character varying(50),
-    customer_name character varying(200),
-    customer_email character varying(150),
     customer_phone character varying(20),
     session_id character varying(100),
     channel character varying(20) DEFAULT 'phone'::character varying,
@@ -159,7 +157,6 @@ COMMENT ON COLUMN public.callbot_interactions.metadata IS 'Données additionnell
 
 CREATE VIEW public.v_active_interactions AS
  SELECT interaction_id,
-    customer_name,
     intent,
     urgency,
     action_taken,
@@ -196,7 +193,6 @@ CREATE VIEW public.v_daily_stats AS
 
 CREATE VIEW public.v_pending_handoffs AS
  SELECT interaction_id,
-    customer_name,
     customer_phone,
     handoff_reason,
     handoff_queue,
@@ -212,7 +208,7 @@ CREATE VIEW public.v_pending_handoffs AS
 -- Data for Name: callbot_interactions; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.callbot_interactions (interaction_id, created_at, updated_at, customer_id, customer_name, customer_email, customer_phone, session_id, channel, intent, urgency, emotion, confidence, customer_message, bot_response, conversation_history, action_taken, action_type, action_result, success, crm_action_details, execution_time_ms, is_handoff, handoff_reason, handoff_queue, handoff_department, assigned_agent, ticket_status, estimated_wait_seconds, status, priority, resolved_at, resolution_time_seconds, customer_satisfaction, feedback_comment, metadata) FROM stdin;
+COPY public.callbot_interactions (interaction_id, created_at, updated_at, customer_id, customer_phone, session_id, channel, intent, urgency, emotion, confidence, customer_message, bot_response, conversation_history, action_taken, action_type, action_result, success, crm_action_details, execution_time_ms, is_handoff, handoff_reason, handoff_queue, handoff_department, assigned_agent, ticket_status, estimated_wait_seconds, status, priority, resolved_at, resolution_time_seconds, customer_satisfaction, feedback_comment, metadata) FROM stdin;
 INT-2026-77df2a36	2026-01-24 17:53:10.819919	2026-01-24 17:53:10.819919	CUST-001	Jean Dupont	jean.dupont@example.com	+33612345678	SESSION-001	phone	update_address	low	neutral	0.95	Je veux mettre à jour mon adresse	Bien sûr, je peux vous aider à mettre à jour votre adresse.	[]	crm_action	update_address	\N	t	{"new_address": "456 Av Champs-Élysées", "old_address": "123 Rue Paris"}	\N	f	\N	\N	\N	\N	\N	\N	completed	normal	\N	\N	\N	\N	{}
 INT-2026-5069e150	2026-01-24 17:53:10.819919	2026-01-24 17:53:10.819919	CUST-002	Marie Dubois	marie.dubois@example.com	+33687654321	SESSION-002	phone	declare_claim	high	stressed	0.88	Mon fils a eu un accident grave ! C'est urgent !	Je comprends votre situation. Je vous mets en relation avec un agent spécialisé.	[]	human_handoff	\N	\N	t	\N	\N	t	Cas urgent - accident grave	urgent	sinistres	\N	pending	120	in_progress	high	\N	\N	\N	\N	{}
 INT-2026-21D3CD07	2026-01-24 18:09:08.241881	2026-01-24 18:09:08.365865	TEST-CUST-001	\N	\N	\N	TEST-SESSION-001	phone	test_connection	low	neutral	0.95	\N	\N	[]	automated_response	\N	\N	t	\N	\N	f	\N	\N	\N	\N	\N	\N	completed	normal	2026-01-24 18:09:08.365865	0	\N	\N	{}
