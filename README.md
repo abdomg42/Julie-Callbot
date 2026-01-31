@@ -170,44 +170,6 @@ ollama pull llama3.2:1b-instruct
 CALLBOT_USE_LLM=true
 ```
 
-## Files to Remove (Cleanup)
-
-These files/folders can be safely deleted for production:
-
-```
-# Cache and compiled files
-__pycache__/                          # All __pycache__ folders
-*.pyc                                 # Compiled Python files
-app/__pycache__/
-core/__pycache__/
-tool_router/__pycache__/
-tool_router/src/__pycache__/
-
-# Duplicate/test data
-data/                                 # Root data folder (duplicate)
-app/tool_router/                      # Duplicate tool_router in app/
-tool_router/cache/tts_cache/          # TTS cache (regenerated)
-RAG/embedding_cache/                  # Embedding cache (regenerated)
-
-# Test files
-app/test_twilio_call.py               # Test script
-app/dashboard_satisfaction.py         # CLI dashboard (replaced by web)
-
-# Development files
-.env.example                          # Keep only .env
-Dashboard/SETUP_RUNNING.md            # Setup notes
-Dashboard/.github/                    # GitHub config
-```
-
-**Cleanup command:**
-```powershell
-# Remove __pycache__ folders
-Get-ChildItem -Path . -Filter "__pycache__" -Recurse -Directory | Remove-Item -Recurse -Force
-
-# Remove .pyc files
-Get-ChildItem -Path . -Filter "*.pyc" -Recurse | Remove-Item -Force
-```
-
 ## Configuration Options
 
 | Variable | Default | Description |
@@ -220,4 +182,4 @@ Get-ChildItem -Path . -Filter "*.pyc" -Recurse | Remove-Item -Force
 
 ## License
 
-Proprietary — CNP Assurances / AI Dreamer
+CNP Assurances / AI Dreamer
