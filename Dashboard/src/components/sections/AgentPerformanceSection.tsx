@@ -97,7 +97,7 @@ const AgentPerformanceSection: React.FC<AgentPerformanceSectionProps> = ({ agent
         {
           label: 'Resolution Rate (%)',
           data: sortedIntents.map(a => Number(a.resolution_rate ?? 0)),
-          backgroundColor: 'rgba(13, 148, 136, 0.22)',
+          backgroundColor: '#2DD4BF', 
           hoverBackgroundColor: '#0d9488',
           borderRadius: 10,
           borderSkipped: false,
@@ -209,7 +209,7 @@ const AgentPerformanceSection: React.FC<AgentPerformanceSectionProps> = ({ agent
           />
         </div>
 
-        {/* Intent table (replaces cards) */}
+        {/* Intent table */}
         <div className={`${card} overflow-hidden mb-8`}>
           <div className="px-6 py-4 border-b border-ink-200/70 bg-ink-50">
             <h3 className="text-title text-ink-900">Intent Leaderboard</h3>
@@ -273,7 +273,7 @@ const AgentPerformanceSection: React.FC<AgentPerformanceSectionProps> = ({ agent
           </div>
         </div>
 
-        {/* ✅ Latest conversations (sorted by high resolution + satisfaction) */}
+        {/*  Latest conversations (sorted by high resolution + satisfaction) */}
         <div className={`${card} overflow-hidden`}>
           <div className="px-6 py-4 border-b border-ink-200/70 bg-ink-50">
             <h3 className="text-title text-ink-900">Latest Conversations (Best First)</h3>

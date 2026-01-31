@@ -157,6 +157,7 @@ const Chart: React.FC<ChartProps> = ({ type, data, options = {}, className = '' 
             { topLeft: 10, topRight: 10, bottomLeft: 0, bottomRight: 0 },
           borderSkipped: ds.borderSkipped ?? 'bottom',
 
+
           // ✅ avoid pill/capsule look: keep thickness reasonable
           // If you want EVEN thicker, increase barThickness/maxBarThickness.
           barThickness: ds.barThickness ?? 50,
