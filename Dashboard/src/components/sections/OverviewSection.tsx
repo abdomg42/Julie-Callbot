@@ -45,10 +45,10 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
       {
         label: 'Response Time (ms)',
         data: [1200, 1100, 1400, 1300, metrics.avgResponseTime, 1000, 1150],
-        backgroundColor: '#e4e4e7',
         hoverBackgroundColor: '#0d9488',
         borderRadius: 10,
         borderSkipped: false,
+        backgroundColor: '#2DD4BF', 
       },
     ],
   };
@@ -199,11 +199,11 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
           <Chart
             type="bar"
             data={responseTimeData}
-            className="h-60 w-full"
+            className="h-60 w-full "
             options={{
               scales: {
                 x: {
-                  // ✅ makes bars occupy more horizontal space per category
+                  //
                   categoryPercentage: 0.8,
                   barPercentage: 0.95,
                   grid: { display: false },

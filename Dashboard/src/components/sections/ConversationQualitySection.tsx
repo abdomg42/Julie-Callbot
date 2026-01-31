@@ -12,24 +12,47 @@ const ConversationQualitySection: React.FC<ConversationQualitySectionProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
 
   // Calculate conversation quality score
-  const calculateQualityScore = (interaction: Interaction): number => {
-    let score = (interaction.customer_satisfaction || 0) * 20; // 20-100 base on satisfaction
-    if (interaction.success) score += 10;
-    if (interaction.execution_time_ms && interaction.execution_time_ms < 2000) score += 10;
-    if (interaction.is_handoff) score -= 10;
+ const calculateQualityScore = (interaction: Interaction): number => {
+  let score = 35;
 
-    // Emotion progression bonus
-    const history = interaction.conversation_history;
-    if (Array.isArray(history) && history.length > 2) {
-      const firstEmotion = history[0]?.detected_emotion;
-      const lastEmotion = history[history.length - 1]?.detected_emotion;
-      if (firstEmotion === 'frustrated' && (lastEmotion === 'satisfied' || lastEmotion === 'positive')) {
-        score += 15; // Successful de-escalation
-      }
-    }
+  const history = Array.isArray(interaction.conversation_history)
+    ? (interaction.conversation_history as any[])
+    : [];
 
-    return Math.min(Math.max(score, 0), 100);
-  };
+  // --- helpers to safely get first/last meaningful signals ---
+  const firstCustomerTurn = history.find(h => h?.speaker === 'customer');
+  const firstDetectedIntent = firstCustomerTurn?.detected_intent ?? null;
+  const firstEmotion = firstCustomerTurn?.detected_emotion ?? interaction.emotion ?? null;
+
+  const lastNonNullEmotion =
+    [...history].reverse().find(h => h?.detected_emotion != null)?.detected_emotion ??
+    interaction.emotion ??
+    null;
+
+  // 1) Satisfaction bonus
+  //  1 = satisfied (good), 2 = unsatisfied (bad)
+  if ((interaction as any).satisfaction_score === 1) score += 50;
+
+  // 2) Intent correctness
+  // If we have a detected_intent, compare it to interaction.intent.
+  if (firstDetectedIntent) {
+    if (firstDetectedIntent === interaction.intent) score += 15;
+    else score -= 10;
+  }
+
+  // 3) Escalation penalty (handoff)
+  const escalated = Boolean(interaction.is_handoff) || interaction.action_taken === 'human_handoff';
+  if (escalated) score -= 10;
+
+  // 4) De-escalation bonus
+  const badStart = ['frustrated', 'stressed', 'negative'].includes(String(firstEmotion));
+  const goodEnd = ['satisfied', 'positive', 'neutral'].includes(String(lastNonNullEmotion));
+  if (badStart && goodEnd) score += 15;
+
+  // clamp 0..100
+  return Math.min(Math.max(score, 0), 100);
+};
+
 
   const badge = (tone: 'green' | 'red' | 'gray' | 'amber' | 'blue') => {
     switch (tone) {
