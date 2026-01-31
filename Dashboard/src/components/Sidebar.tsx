@@ -34,12 +34,12 @@ const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange }) => {
       {/* Brand */}
       <div className="px-4 md:px-5 mb-8">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center">
+          {/* <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center">
             <span className="text-white font-semibold text-lg leading-none">
-
+            <img src="" alt="" />
 
             </span>
-          </div>
+          </div> */}
 
           {/* hide on mobile */}
           <div className="hidden md:block">

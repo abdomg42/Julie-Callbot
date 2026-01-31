@@ -1,6 +1,0 @@
-fastapi
-uvicorn[standard]
-twilio
-websockets
-python-multipart
-pydub

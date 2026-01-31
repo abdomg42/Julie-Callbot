@@ -1,7 +1,102 @@
-venv
+# =============================================================================
+# CALLBOT JULIE - GITIGNORE
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Python
+# -----------------------------------------------------------------------------
+venv/
 __pycache__/
-*.pyc
-cache/
-logs/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+
+# -----------------------------------------------------------------------------
+# Node.js
+# -----------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+
+# -----------------------------------------------------------------------------
+# Environment & Secrets
+# -----------------------------------------------------------------------------
 .env
+.env.local
+.env.*.local
+secrets.json
+
+# -----------------------------------------------------------------------------
+# IDE & Editors
+# -----------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -----------------------------------------------------------------------------
+# OS Files
+# -----------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------------------------------------------------------------
+# Logs & Cache
+# -----------------------------------------------------------------------------
+*.log
+logs/
+cache/
+*.cache
+tmp/
+temp/
+
+# -----------------------------------------------------------------------------
+# Project Specific
+# -----------------------------------------------------------------------------
+# TTS audio cache
 tts_cache/
+tool_router/cache/tts_cache/*.mp3
+tool_router/cache/tts_cache/*.wav
+app/tool_router/cache/tts_cache/*
+
+# RAG index (can be rebuilt)
+RAG/faiss_index/
+RAG/embedding_cache/
+
+# Audio recordings
+inputs/audio/*.wav
+inputs/audio/*.mp3
+
+# Build outputs
+Dashboard/dist/
+
+# Database backups
+*.backup
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

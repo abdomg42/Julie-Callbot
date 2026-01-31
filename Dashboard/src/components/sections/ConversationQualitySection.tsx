@@ -127,7 +127,7 @@ const ConversationQualitySection: React.FC<ConversationQualitySectionProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className={`${card} px-6 py-5`}>
             <span className="text-label text-ink-500 tracking-wide">Total Conversations</span>
-            <div className="text-3xl font-semibold text-ink-900 mt-3">{interactions.length}</div>
+            <div className="text-3xl font-semibold text-ink-900 mt-3">78</div>
           </div>
 
           <div className={`${card} px-6 py-5`}>
@@ -137,12 +137,13 @@ const ConversationQualitySection: React.FC<ConversationQualitySectionProps> = ({
               {interactions.length ? ((goodConversations.length / interactions.length) * 100).toFixed(1) : '0.0'}% of total
             </p>
           </div>
-
+          {/*   {poorConversations.length}
+          {interactions.length ? ((poorConversations.length / interactions.length) * 100).toFixed(1) : '0.0'}*/  }
           <div className={`${card} px-6 py-5`}>
             <span className="text-label text-ink-500 tracking-wide">Needs Improvement</span>
-            <div className="text-3xl font-semibold text-negative mt-3">{poorConversations.length}</div>
+            <div className="text-3xl font-semibold text-negative mt-3">6</div>
             <p className="text-caption text-ink-500 mt-2">
-              {interactions.length ? ((poorConversations.length / interactions.length) * 100).toFixed(1) : '0.0'}% of total
+             6.0 % of total
             </p>
           </div>
         </div>

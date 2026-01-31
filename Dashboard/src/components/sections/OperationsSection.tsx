@@ -114,7 +114,7 @@ const OperationsSection: React.FC<OperationsSectionProps> = ({ interactions }) =
 
   const avgRespSec =
     interactions.length
-      ? interactions.reduce((sum, i) => sum + ms(i.execution_time_ms), 0) / interactions.length / 1000
+      ? interactions.reduce((sum, i) => sum + ms(i.execution_time_ms), 0) / interactions.length
       : 0;
 
   const totalHandoffs = interactions.filter(i => i.is_handoff).length;
@@ -140,7 +140,7 @@ const OperationsSection: React.FC<OperationsSectionProps> = ({ interactions }) =
               </div>
             </div>
             <div className="mt-3 text-3xl font-semibold text-ink-900">
-              {avgRespSec.toFixed(2)}s
+              {avgRespSec.toFixed(2)}ms
             </div>
             <p className="text-caption text-ink-500 mt-2">Based on execution_time_ms</p>
           </div>

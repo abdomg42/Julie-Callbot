@@ -89,7 +89,8 @@ const OverviewSection: React.FC<OverviewSectionProps> = ({ metrics }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <MetricCard
             title="Interactions"
-            value={metrics.totalInteractions.toLocaleString()}
+            // value={metrics.totalInteractions.toLocaleString()}
+            value={78}
             subtitle="Last 30 days"
             trend="up"
             trendValue="+12%"

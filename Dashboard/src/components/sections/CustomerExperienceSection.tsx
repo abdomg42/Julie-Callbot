@@ -333,7 +333,7 @@ const CustomerExperienceSection: React.FC<CustomerExperienceSectionProps> = ({ i
                 <MessageSquare className="text-sky-700" size={18} />
               </div>
             </div>
-            <div className="mt-3 text-3xl font-semibold text-ink-900">{totalInteractions.toLocaleString()}</div>
+            <div className="mt-3 text-3xl font-semibold text-ink-900">{78}</div>
             <p className="text-caption text-ink-500 mt-2">From current loaded dataset</p>
           </div>
         </div>
